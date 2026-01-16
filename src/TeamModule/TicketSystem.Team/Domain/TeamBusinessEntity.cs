@@ -32,7 +32,7 @@ public class TeamBusinessEntity
         Description = description;
     }
 
-    public virtual TeamMemberBusinessEntity AddMember(Guid userId, TeamRole role = TeamRole.Member)
+    public virtual TeamMemberBusinessEntity AddMember(long userId, TeamRole role = TeamRole.Member)
     {
         if (_members.Any(m => m.UserId == userId))
             throw new InvalidOperationException($"User {userId} is already a member of this team.");
@@ -43,7 +43,7 @@ public class TeamBusinessEntity
         return member;
     }
 
-    public virtual void RemoveMember(Guid userId)
+    public virtual void RemoveMember(long userId)
     {
         var member = _members.FirstOrDefault(m => m.UserId == userId);
         if (member == null)
@@ -52,7 +52,7 @@ public class TeamBusinessEntity
         _members.Remove(member);
     }
 
-    public virtual bool HasMember(Guid userId)
+    public virtual bool HasMember(long userId)
     {
         return _members.Any(m => m.UserId == userId);
     }

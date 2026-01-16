@@ -21,7 +21,7 @@ public class UserGrpcService : UserService.UserServiceBase
 
     public override async Task<GetUserResponse> GetUser(GetUserRequest request, ServerCallContext context)
     {
-        if (!Guid.TryParse(request.UserId, out var userId))
+        if (!long.TryParse(request.UserId, out var userId))
             throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid user_id"));
 
         var user = await _userModuleApi.GetUserAsync(userId);
@@ -43,7 +43,7 @@ public class UserGrpcService : UserService.UserServiceBase
     {
         try
         {
-            var userId = Guid.Parse(request.UserId);
+            var userId = long.Parse(request.UserId);
             await _userModuleApi.UpdateUserAsync(userId, request.FirstName, request.LastName);
             return new UpdateUserResponse();
         }
@@ -61,7 +61,7 @@ public class UserGrpcService : UserService.UserServiceBase
     {
         try
         {
-            var userId = Guid.Parse(request.UserId);
+            var userId = long.Parse(request.UserId);
             await _userModuleApi.DeactivateUserAsync(userId);
             return new DeactivateUserResponse();
         }

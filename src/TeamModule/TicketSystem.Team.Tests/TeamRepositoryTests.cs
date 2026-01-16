@@ -13,7 +13,7 @@ public class TeamRepositoryTests
     {
         var session = Substitute.For<ISession>();
         var repository = new TeamRepository(session);
-        var teamId = TeamId.New();
+        var teamId = new TeamId(1);
 
         await repository.GetByIdAsync(teamId);
 

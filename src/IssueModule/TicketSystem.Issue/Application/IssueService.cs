@@ -22,7 +22,7 @@ internal class IssueService
 
     public async Task<IssueId> CreateIssueAsync(string title, string? description, IssuePriority priority, DateTime? dueDate)
     {
-        var issueId = IssueId.New();
+        var issueId = await _issueRepository.GetNextIdAsync();
         var issue = new IssueBusinessEntity(issueId, title, description, priority, dueDate);
 
         await _issueRepository.AddAsync(issue);
@@ -54,7 +54,7 @@ internal class IssueService
         await _issueRepository.UpdateAsync(issue);
     }
 
-    public async Task AssignIssueToUserAsync(IssueId issueId, Guid? userId)
+    public async Task AssignIssueToUserAsync(IssueId issueId, long? userId)
     {
         var issue = await _issueRepository.GetByIdAsync(issueId);
         if (issue == null)
@@ -71,7 +71,7 @@ internal class IssueService
         await _issueRepository.UpdateAsync(issue);
     }
 
-    public async Task AssignIssueToTeamAsync(IssueId issueId, Guid? teamId)
+    public async Task AssignIssueToTeamAsync(IssueId issueId, long? teamId)
     {
         var issue = await _issueRepository.GetByIdAsync(issueId);
         if (issue == null)
@@ -98,12 +98,12 @@ internal class IssueService
         await _issueRepository.UpdateAsync(issue);
     }
 
-    public async Task<IReadOnlyList<IssueBusinessEntity>> GetIssuesByUserAsync(Guid userId)
+    public async Task<IReadOnlyList<IssueBusinessEntity>> GetIssuesByUserAsync(long userId)
     {
         return await _issueRepository.GetByUserIdAsync(userId);
     }
 
-    public async Task<IReadOnlyList<IssueBusinessEntity>> GetIssuesByTeamAsync(Guid teamId)
+    public async Task<IReadOnlyList<IssueBusinessEntity>> GetIssuesByTeamAsync(long teamId)
     {
         return await _issueRepository.GetByTeamIdAsync(teamId);
     }

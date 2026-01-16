@@ -32,13 +32,14 @@ public class IssueServiceTests
         var priority = IssuePriority.High;
         DateTime? dueDate = DateTime.UtcNow.AddDays(7);
         
+        _issueRepository.GetNextIdAsync().Returns(new IssueId(1));
         _issueRepository.AddAsync(Arg.Any<IssueBusinessEntity>()).Returns(Task.CompletedTask);
 
         // Act
         var issueId = await _issueService.CreateIssueAsync(title, description, priority, dueDate);
 
         // Assert
-        Assert.That(issueId.Value, Is.Not.EqualTo(Guid.Empty));
+        Assert.That(issueId.Value, Is.EqualTo(1));
         await _issueRepository.Received(1).AddAsync(Arg.Is<IssueBusinessEntity>(t => 
             t.Title == title && t.Description == description && t.Priority == priority));
     }
@@ -47,7 +48,7 @@ public class IssueServiceTests
     public async Task GetIssueAsync_WithExistingIssue_ReturnsIssue()
     {
         // Arrange
-        var issueId = IssueId.New();
+        var issueId = new IssueId(1);
         var issue = new IssueBusinessEntity(issueId, "Bug", "Description", IssuePriority.Medium, null);
         
         _issueRepository.GetByIdAsync(issueId).Returns(issue);
@@ -63,7 +64,7 @@ public class IssueServiceTests
     public async Task GetIssueAsync_WithNonExistingIssue_ThrowsKeyNotFoundException()
     {
         // Arrange
-        var issueId = IssueId.New();
+        var issueId = new IssueId(1);
         _issueRepository.GetByIdAsync(issueId).Returns((IssueBusinessEntity?)null);
 
         // Act & Assert
@@ -75,8 +76,8 @@ public class IssueServiceTests
     public async Task AssignIssueToUserAsync_WithValidUser_AssignsIssue()
     {
         // Arrange
-        var issueId = IssueId.New();
-        var userId = Guid.NewGuid();
+        var issueId = new IssueId(1);
+        long userId = 1;
         var issue = new IssueBusinessEntity(issueId, "Bug", "Description", IssuePriority.Medium, null);
         
         _issueRepository.GetByIdAsync(issueId).Returns(issue);
@@ -95,8 +96,8 @@ public class IssueServiceTests
     public async Task AssignIssueToUserAsync_WithNonExistingUser_ThrowsInvalidOperationException()
     {
         // Arrange
-        var issueId = IssueId.New();
-        var userId = Guid.NewGuid();
+        var issueId = new IssueId(1);
+        long userId = 1;
         var issue = new IssueBusinessEntity(issueId, "Bug", "Description", IssuePriority.Medium, null);
         
         _issueRepository.GetByIdAsync(issueId).Returns(issue);
@@ -111,8 +112,8 @@ public class IssueServiceTests
     public async Task AssignIssueToTeamAsync_WithValidTeam_AssignsIssue()
     {
         // Arrange
-        var issueId = IssueId.New();
-        var teamId = Guid.NewGuid();
+        var issueId = new IssueId(1);
+        long teamId = 1;
         var issue = new IssueBusinessEntity(issueId, "Bug", "Description", IssuePriority.Medium, null);
         
         _issueRepository.GetByIdAsync(issueId).Returns(issue);
@@ -130,7 +131,7 @@ public class IssueServiceTests
     public async Task UpdateIssueStatusAsync_WithValidStatus_UpdatesStatus()
     {
         // Arrange
-        var issueId = IssueId.New();
+        var issueId = new IssueId(1);
         var issue = new IssueBusinessEntity(issueId, "Bug", "Description", IssuePriority.Medium, null);
         
         _issueRepository.GetByIdAsync(issueId).Returns(issue);
@@ -147,7 +148,7 @@ public class IssueServiceTests
     public async Task DeleteIssueAsync_WithExistingIssue_DeletesIssue()
     {
         // Arrange
-        var issueId = IssueId.New();
+        var issueId = new IssueId(1);
         var issue = new IssueBusinessEntity(issueId, "Bug", "Description", IssuePriority.Medium, null);
         
         _issueRepository.GetByIdAsync(issueId).Returns(issue);

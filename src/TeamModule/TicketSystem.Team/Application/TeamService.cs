@@ -16,7 +16,7 @@ internal class TeamService
 
     public async Task<TeamId> CreateTeamAsync(string name, string? description)
     {
-        var teamId = TeamId.New();
+        var teamId = await _teamRepository.GetNextIdAsync();
         var team = new TeamBusinessEntity(teamId, name, description);
         
         await _teamRepository.AddAsync(team);
@@ -48,7 +48,7 @@ internal class TeamService
         await _teamRepository.UpdateAsync(team);
     }
 
-    public async Task AddMemberToTeamAsync(TeamId teamId, Guid userId, TeamRole role = TeamRole.Member)
+    public async Task AddMemberToTeamAsync(TeamId teamId, long userId, TeamRole role = TeamRole.Member)
     {
         var team = await _teamRepository.GetByIdAsync(teamId);
         if (team == null)
@@ -63,7 +63,7 @@ internal class TeamService
         await _teamRepository.UpdateAsync(team);
     }
 
-    public async Task RemoveMemberFromTeamAsync(TeamId teamId, Guid userId)
+    public async Task RemoveMemberFromTeamAsync(TeamId teamId, long userId)
     {
         var team = await _teamRepository.GetByIdAsync(teamId);
         if (team == null)
@@ -87,7 +87,7 @@ internal class TeamService
         return await _teamRepository.ExistsAsync(teamId);
     }
 
-    public async Task<IReadOnlyList<Guid>> GetTeamMemberIdsAsync(TeamId teamId)
+    public async Task<IReadOnlyList<long>> GetTeamMemberIdsAsync(TeamId teamId)
     {
         var team = await _teamRepository.GetByIdAsync(teamId);
         if (team == null)

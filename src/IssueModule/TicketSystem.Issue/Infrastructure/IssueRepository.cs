@@ -13,6 +13,15 @@ internal class IssueRepository : IIssueRepository
         _session = session;
     }
 
+    public async Task<IssueId> GetNextIdAsync()
+    {
+        var maxId = await _session.QueryOver<IssueBusinessEntity>()
+            .Select(Projections.Max<IssueBusinessEntity>(i => i.Id))
+            .SingleOrDefaultAsync<IssueId>();
+        
+        return new IssueId(maxId.Value + 1);
+    }
+
     public async Task<IssueBusinessEntity?> GetByIdAsync(IssueId id)
     {
         return await _session.GetAsync<IssueBusinessEntity>(id);
@@ -26,7 +35,7 @@ internal class IssueRepository : IIssueRepository
         return issues.ToList();
     }
 
-    public async Task<IReadOnlyList<IssueBusinessEntity>> GetByUserIdAsync(Guid userId)
+    public async Task<IReadOnlyList<IssueBusinessEntity>> GetByUserIdAsync(long userId)
     {
         var issues = await _session.QueryOver<IssueBusinessEntity>()
             .Where(x => x.AssignedUserId == userId)
@@ -35,7 +44,7 @@ internal class IssueRepository : IIssueRepository
         return issues.ToList();
     }
 
-    public async Task<IReadOnlyList<IssueBusinessEntity>> GetByTeamIdAsync(Guid teamId)
+    public async Task<IReadOnlyList<IssueBusinessEntity>> GetByTeamIdAsync(long teamId)
     {
         var issues = await _session.QueryOver<IssueBusinessEntity>()
             .Where(x => x.AssignedTeamId == teamId)

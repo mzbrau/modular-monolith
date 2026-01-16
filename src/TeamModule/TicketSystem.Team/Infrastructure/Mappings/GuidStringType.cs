@@ -7,11 +7,11 @@ using NHibernate.UserTypes;
 
 namespace TicketSystem.Team.Infrastructure.Mappings;
 
-public class GuidStringType : IUserType
+public class LongType : IUserType
 {
-    public SqlType[] SqlTypes => new[] { new SqlType(DbType.String) };
+    public SqlType[] SqlTypes => new[] { new SqlType(DbType.Int64) };
 
-    public Type ReturnedType => typeof(Guid);
+    public Type ReturnedType => typeof(long);
 
     public bool IsMutable => false;
 
@@ -32,20 +32,20 @@ public class GuidStringType : IUserType
 
     public object NullSafeGet(DbDataReader rs, string[] names, ISessionImplementor session, object owner)
     {
-        var value = NHibernateUtil.String.NullSafeGet(rs, names[0], session);
-        if (value == null) return Guid.Empty;
-        return Guid.Parse((string)value);
+        var value = NHibernateUtil.Int64.NullSafeGet(rs, names[0], session);
+        if (value == null) return 0L;
+        return (long)value;
     }
 
     public void NullSafeSet(DbCommand cmd, object value, int index, ISessionImplementor session)
     {
-        if (value == null || value is Guid guid && guid == Guid.Empty)
+        if (value == null || value is long id && id == 0)
         {
-            NHibernateUtil.String.NullSafeSet(cmd, null, index, session);
+            NHibernateUtil.Int64.NullSafeSet(cmd, null, index, session);
         }
         else
         {
-            NHibernateUtil.String.NullSafeSet(cmd, ((Guid)value).ToString(), index, session);
+            NHibernateUtil.Int64.NullSafeSet(cmd, (long)value, index, session);
         }
     }
 

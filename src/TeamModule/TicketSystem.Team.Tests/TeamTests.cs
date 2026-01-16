@@ -27,13 +27,14 @@ public class TeamServiceTests
         const string name = "Development Team";
         const string description = "Main development team";
         
+        _teamRepository.GetNextIdAsync().Returns(new TeamId(1));
         _teamRepository.AddAsync(Arg.Any<TeamBusinessEntity>()).Returns(Task.CompletedTask);
 
         // Act
         var teamId = await _teamService.CreateTeamAsync(name, description);
 
         // Assert
-        Assert.That(teamId.Value, Is.Not.EqualTo(Guid.Empty));
+        Assert.That(teamId.Value, Is.EqualTo(1));
         await _teamRepository.Received(1).AddAsync(Arg.Is<TeamBusinessEntity>(t => 
             t.Name == name && t.Description == description));
     }
@@ -42,7 +43,7 @@ public class TeamServiceTests
     public async Task GetTeamAsync_WithExistingTeam_ReturnsTeam()
     {
         // Arrange
-        var teamId = TeamId.New();
+        var teamId = new TeamId(1);
         var team = new TeamBusinessEntity(teamId, "Dev Team", "Description");
         
         _teamRepository.GetByIdAsync(teamId).Returns(team);
@@ -58,7 +59,7 @@ public class TeamServiceTests
     public async Task GetTeamAsync_WithNonExistingTeam_ThrowsKeyNotFoundException()
     {
         // Arrange
-        var teamId = TeamId.New();
+        var teamId = new TeamId(1);
         _teamRepository.GetByIdAsync(teamId).Returns((TeamBusinessEntity?)null);
 
         // Act & Assert
@@ -70,8 +71,8 @@ public class TeamServiceTests
     public async Task AddMemberToTeamAsync_WithValidUserAndTeam_AddsMember()
     {
         // Arrange
-        var teamId = TeamId.New();
-        var userId = Guid.NewGuid();
+        var teamId = new TeamId(1);
+        long userId = 1;
         var team = new TeamBusinessEntity(teamId, "Dev Team", "Description");
         
         _teamRepository.GetByIdAsync(teamId).Returns(team);
@@ -90,8 +91,8 @@ public class TeamServiceTests
     public async Task AddMemberToTeamAsync_WithNonExistingUser_ThrowsInvalidOperationException()
     {
         // Arrange
-        var teamId = TeamId.New();
-        var userId = Guid.NewGuid();
+        var teamId = new TeamId(1);
+        long userId = 1;
         var team = new TeamBusinessEntity(teamId, "Dev Team", "Description");
         
         _teamRepository.GetByIdAsync(teamId).Returns(team);
@@ -106,8 +107,8 @@ public class TeamServiceTests
     public async Task RemoveMemberFromTeamAsync_WithExistingMember_RemovesMember()
     {
         // Arrange
-        var teamId = TeamId.New();
-        var userId = Guid.NewGuid();
+        var teamId = new TeamId(1);
+        long userId = 1;
         var team = new TeamBusinessEntity(teamId, "Dev Team", "Description");
         team.AddMember(userId, TeamRole.Member);
         

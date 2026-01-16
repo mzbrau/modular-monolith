@@ -1,3 +1,4 @@
+using System.Data;
 using System.Data.Common;
 using NHibernate;
 using NHibernate.Engine;
@@ -6,10 +7,10 @@ using NHibernate.UserTypes;
 
 namespace TicketSystem.Issue.Infrastructure.Mappings;
 
-public class NullableGuidType : IUserType
+public class NullableLongType : IUserType
 {
-    public SqlType[] SqlTypes => new[] { NHibernateUtil.String.SqlType };
-    public Type ReturnedType => typeof(Guid?);
+    public SqlType[] SqlTypes => new[] { new SqlType(DbType.Int64) };
+    public Type ReturnedType => typeof(long?);
     public bool IsMutable => false;
 
     public new bool Equals(object? x, object? y)
@@ -23,21 +24,20 @@ public class NullableGuidType : IUserType
 
     public object? NullSafeGet(DbDataReader rs, string[] names, ISessionImplementor session, object owner)
     {
-        var value = NHibernateUtil.String.NullSafeGet(rs, names[0], session);
+        var value = NHibernateUtil.Int64.NullSafeGet(rs, names[0], session);
         if (value == null) return null;
-        var str = (string)value;
-        return string.IsNullOrWhiteSpace(str) ? null : Guid.Parse(str);
+        return (long?)value;
     }
 
     public void NullSafeSet(DbCommand cmd, object? value, int index, ISessionImplementor session)
     {
         if (value == null)
         {
-            NHibernateUtil.String.NullSafeSet(cmd, null, index, session);
+            NHibernateUtil.Int64.NullSafeSet(cmd, null, index, session);
             return;
         }
 
-        NHibernateUtil.String.NullSafeSet(cmd, ((Guid)value).ToString(), index, session);
+        NHibernateUtil.Int64.NullSafeSet(cmd, (long)value, index, session);
     }
 
     public object DeepCopy(object value) => value;

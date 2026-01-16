@@ -21,7 +21,7 @@ public class TeamGrpcService : TeamService.TeamServiceBase
 
     public override async Task<GetTeamResponse> GetTeam(GetTeamRequest request, ServerCallContext context)
     {
-        if (!Guid.TryParse(request.TeamId, out var teamId))
+        if (!long.TryParse(request.TeamId, out var teamId))
             throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid team_id"));
 
         var team = await _teamModuleApi.GetTeamAsync(teamId);
@@ -43,7 +43,7 @@ public class TeamGrpcService : TeamService.TeamServiceBase
     {
         try
         {
-            var teamId = Guid.Parse(request.TeamId);
+            var teamId = long.Parse(request.TeamId);
             await _teamModuleApi.UpdateTeamAsync(teamId, request.Name, request.Description);
             return new UpdateTeamResponse();
         }
@@ -61,8 +61,8 @@ public class TeamGrpcService : TeamService.TeamServiceBase
     {
         try
         {
-            var teamId = Guid.Parse(request.TeamId);
-            var userId = Guid.Parse(request.UserId);
+            var teamId = long.Parse(request.TeamId);
+            var userId = long.Parse(request.UserId);
             await _teamModuleApi.AddMemberToTeamAsync(teamId, userId, request.Role);
             return new AddMemberToTeamResponse();
         }
@@ -76,7 +76,7 @@ public class TeamGrpcService : TeamService.TeamServiceBase
         }
         catch (FormatException)
         {
-            throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid GUID in request"));
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid ID in request"));
         }
     }
 
@@ -84,8 +84,8 @@ public class TeamGrpcService : TeamService.TeamServiceBase
     {
         try
         {
-            var teamId = Guid.Parse(request.TeamId);
-            var userId = Guid.Parse(request.UserId);
+            var teamId = long.Parse(request.TeamId);
+            var userId = long.Parse(request.UserId);
             await _teamModuleApi.RemoveMemberFromTeamAsync(teamId, userId);
             return new RemoveMemberFromTeamResponse();
         }
@@ -99,7 +99,7 @@ public class TeamGrpcService : TeamService.TeamServiceBase
         }
         catch (FormatException)
         {
-            throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid GUID in request"));
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid ID in request"));
         }
     }
 
@@ -107,7 +107,7 @@ public class TeamGrpcService : TeamService.TeamServiceBase
     {
         try
         {
-            var teamId = Guid.Parse(request.TeamId);
+            var teamId = long.Parse(request.TeamId);
             var members = await _teamModuleApi.GetTeamMembersAsync(teamId);
             var response = new GetTeamMembersResponse();
             response.Members.AddRange(members.Select(MapMemberToMessage));

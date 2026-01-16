@@ -2,18 +2,16 @@ namespace TicketSystem.Team.Domain;
 
 public readonly struct TeamId : IEquatable<TeamId>
 {
-    public Guid Value { get; }
+    public long Value { get; }
 
-    public TeamId(Guid value)
+    public TeamId(long value)
     {
-        if (value == Guid.Empty)
-            throw new ArgumentException("TeamId cannot be empty.", nameof(value));
+        if (value <= 0)
+            throw new ArgumentException("TeamId must be greater than zero.", nameof(value));
         Value = value;
     }
 
-    public static TeamId New() => new(Guid.NewGuid());
-    
-    public static TeamId Parse(string value) => new(Guid.Parse(value));
+    public static TeamId Parse(string value) => new(long.Parse(value));
 
     public bool Equals(TeamId other) => Value.Equals(other.Value);
 
@@ -27,7 +25,7 @@ public readonly struct TeamId : IEquatable<TeamId>
 
     public static bool operator !=(TeamId left, TeamId right) => !left.Equals(right);
 
-    public static implicit operator Guid(TeamId teamId) => teamId.Value;
+    public static implicit operator long(TeamId teamId) => teamId.Value;
     
-    public static implicit operator TeamId(Guid guid) => new(guid);
+    public static implicit operator TeamId(long id) => new(id);
 }

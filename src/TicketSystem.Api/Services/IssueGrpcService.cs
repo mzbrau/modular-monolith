@@ -27,7 +27,7 @@ public class IssueGrpcService : IssueService.IssueServiceBase
 
     public override async Task<GetIssueResponse> GetIssue(GetIssueRequest request, ServerCallContext context)
     {
-        if (!Guid.TryParse(request.IssueId, out var issueId))
+        if (!long.TryParse(request.IssueId, out var issueId))
             throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid issue_id"));
 
         var issue = await _issueModuleApi.GetIssueAsync(issueId);
@@ -49,7 +49,7 @@ public class IssueGrpcService : IssueService.IssueServiceBase
     {
         try
         {
-            var issueId = Guid.Parse(request.IssueId);
+            var issueId = long.Parse(request.IssueId);
             DateTime? dueDate = null;
             if (!string.IsNullOrEmpty(request.DueDate))
             {
@@ -74,8 +74,8 @@ public class IssueGrpcService : IssueService.IssueServiceBase
     {
         try
         {
-            var issueId = Guid.Parse(request.IssueId);
-            Guid? userId = string.IsNullOrEmpty(request.UserId) ? null : Guid.Parse(request.UserId);
+            var issueId = long.Parse(request.IssueId);
+            long? userId = string.IsNullOrEmpty(request.UserId) ? null : long.Parse(request.UserId);
 
             await _issueModuleApi.AssignIssueToUserAsync(issueId, userId);
             return new AssignIssueToUserResponse();
@@ -90,7 +90,7 @@ public class IssueGrpcService : IssueService.IssueServiceBase
         }
         catch (FormatException)
         {
-            throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid GUID in request"));
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid ID in request"));
         }
     }
 
@@ -98,8 +98,8 @@ public class IssueGrpcService : IssueService.IssueServiceBase
     {
         try
         {
-            var issueId = Guid.Parse(request.IssueId);
-            Guid? teamId = string.IsNullOrEmpty(request.TeamId) ? null : Guid.Parse(request.TeamId);
+            var issueId = long.Parse(request.IssueId);
+            long? teamId = string.IsNullOrEmpty(request.TeamId) ? null : long.Parse(request.TeamId);
 
             await _issueModuleApi.AssignIssueToTeamAsync(issueId, teamId);
             return new AssignIssueToTeamResponse();
@@ -114,7 +114,7 @@ public class IssueGrpcService : IssueService.IssueServiceBase
         }
         catch (FormatException)
         {
-            throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid GUID in request"));
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid ID in request"));
         }
     }
 
@@ -122,7 +122,7 @@ public class IssueGrpcService : IssueService.IssueServiceBase
     {
         try
         {
-            var issueId = Guid.Parse(request.IssueId);
+            var issueId = long.Parse(request.IssueId);
             await _issueModuleApi.UpdateIssueStatusAsync(issueId, request.Status);
             return new UpdateIssueStatusResponse();
         }
@@ -138,7 +138,7 @@ public class IssueGrpcService : IssueService.IssueServiceBase
 
     public override async Task<GetIssuesByUserResponse> GetIssuesByUser(GetIssuesByUserRequest request, ServerCallContext context)
     {
-        var userId = Guid.Parse(request.UserId);
+        var userId = long.Parse(request.UserId);
         var issues = await _issueModuleApi.GetIssuesByUserAsync(userId);
         var response = new GetIssuesByUserResponse();
         response.Issues.AddRange(issues.Select(MapToMessage));
@@ -147,7 +147,7 @@ public class IssueGrpcService : IssueService.IssueServiceBase
 
     public override async Task<GetIssuesByTeamResponse> GetIssuesByTeam(GetIssuesByTeamRequest request, ServerCallContext context)
     {
-        var teamId = Guid.Parse(request.TeamId);
+        var teamId = long.Parse(request.TeamId);
         var issues = await _issueModuleApi.GetIssuesByTeamAsync(teamId);
         var response = new GetIssuesByTeamResponse();
         response.Issues.AddRange(issues.Select(MapToMessage));
@@ -158,7 +158,7 @@ public class IssueGrpcService : IssueService.IssueServiceBase
     {
         try
         {
-            var issueId = Guid.Parse(request.IssueId);
+            var issueId = long.Parse(request.IssueId);
             await _issueModuleApi.DeleteIssueAsync(issueId);
             return new DeleteIssueResponse();
         }

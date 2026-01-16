@@ -19,11 +19,11 @@
   </class>
 
   <class name="TeamMemberBusinessEntity" table="TeamMembers" lazy="false">
-    <id name="Id" column="Id" type="TicketSystem.Team.Infrastructure.Mappings.GuidStringType, TicketSystem.Team">
+    <id name="Id" column="Id" type="TicketSystem.Team.Infrastructure.Mappings.LongType, TicketSystem.Team">
       <generator class="assigned" />
     </id>
     
-    <property name="UserId" column="UserId" not-null="true" type="TicketSystem.Team.Infrastructure.Mappings.GuidStringType, TicketSystem.Team" />
+    <property name="UserId" column="UserId" not-null="true" type="TicketSystem.Team.Infrastructure.Mappings.LongType, TicketSystem.Team" />
     <property name="JoinedDate" column="JoinedDate" not-null="true" />
     <property name="Role" column="Role" not-null="true" />
     

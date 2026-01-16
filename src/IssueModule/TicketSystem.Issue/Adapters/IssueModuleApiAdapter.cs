@@ -13,13 +13,13 @@ internal class IssueModuleApiAdapter : IIssueModuleApi
         _issueService = issueService;
     }
 
-    public async Task<Guid> CreateIssueAsync(string title, string? description, int priority, DateTime? dueDate)
+    public async Task<long> CreateIssueAsync(string title, string? description, int priority, DateTime? dueDate)
     {
         var issueId = await _issueService.CreateIssueAsync(title, description, (IssuePriority)priority, dueDate);
         return issueId.Value;
     }
 
-    public async Task<IssueDataContract?> GetIssueAsync(Guid issueId)
+    public async Task<IssueDataContract?> GetIssueAsync(long issueId)
     {
         try
         {
@@ -38,39 +38,39 @@ internal class IssueModuleApiAdapter : IIssueModuleApi
         return issues.Select(IssueConverter.ToDataContract).ToList();
     }
 
-    public async Task UpdateIssueAsync(Guid issueId, string title, string? description, int priority, DateTime? dueDate)
+    public async Task UpdateIssueAsync(long issueId, string title, string? description, int priority, DateTime? dueDate)
     {
         await _issueService.UpdateIssueAsync(new IssueId(issueId), title, description, (IssuePriority)priority, dueDate);
     }
 
-    public async Task AssignIssueToUserAsync(Guid issueId, Guid? userId)
+    public async Task AssignIssueToUserAsync(long issueId, long? userId)
     {
         await _issueService.AssignIssueToUserAsync(new IssueId(issueId), userId);
     }
 
-    public async Task AssignIssueToTeamAsync(Guid issueId, Guid? teamId)
+    public async Task AssignIssueToTeamAsync(long issueId, long? teamId)
     {
         await _issueService.AssignIssueToTeamAsync(new IssueId(issueId), teamId);
     }
 
-    public async Task UpdateIssueStatusAsync(Guid issueId, int status)
+    public async Task UpdateIssueStatusAsync(long issueId, int status)
     {
         await _issueService.UpdateIssueStatusAsync(new IssueId(issueId), (IssueStatus)status);
     }
 
-    public async Task<List<IssueDataContract>> GetIssuesByUserAsync(Guid userId)
+    public async Task<List<IssueDataContract>> GetIssuesByUserAsync(long userId)
     {
         var issues = await _issueService.GetIssuesByUserAsync(userId);
         return issues.Select(IssueConverter.ToDataContract).ToList();
     }
 
-    public async Task<List<IssueDataContract>> GetIssuesByTeamAsync(Guid teamId)
+    public async Task<List<IssueDataContract>> GetIssuesByTeamAsync(long teamId)
     {
         var issues = await _issueService.GetIssuesByTeamAsync(teamId);
         return issues.Select(IssueConverter.ToDataContract).ToList();
     }
 
-    public async Task DeleteIssueAsync(Guid issueId)
+    public async Task DeleteIssueAsync(long issueId)
     {
         await _issueService.DeleteIssueAsync(new IssueId(issueId));
     }

@@ -8,7 +8,7 @@ public class UserBusinessEntityTests
     [Test]
     public void Constructor_WithValidData_CreatesUser()
     {
-        var userId = UserId.New();
+        var userId = new UserId(1);
         const string email = "test@example.com";
         const string firstName = "John";
         const string lastName = "Doe";
@@ -27,20 +27,20 @@ public class UserBusinessEntityTests
     public void Constructor_WithEmptyEmail_ThrowsArgumentException()
     {
         Assert.Throws<ArgumentException>(() =>
-            new UserBusinessEntity(UserId.New(), "", "John", "Doe"));
+            new UserBusinessEntity(new UserId(1), "", "John", "Doe"));
     }
 
     [Test]
     public void Constructor_WithEmptyFirstName_ThrowsArgumentException()
     {
         Assert.Throws<ArgumentException>(() =>
-            new UserBusinessEntity(UserId.New(), "test@example.com", "", "Doe"));
+            new UserBusinessEntity(new UserId(1), "test@example.com", "", "Doe"));
     }
 
     [Test]
     public void Update_WithValidData_UpdatesNameFields()
     {
-        var user = new UserBusinessEntity(UserId.New(), "test@example.com", "John", "Doe");
+        var user = new UserBusinessEntity(new UserId(1), "test@example.com", "John", "Doe");
 
         user.Update("Jane", "Smith");
 
@@ -52,7 +52,7 @@ public class UserBusinessEntityTests
     [Test]
     public void Deactivate_SetsIsActiveToFalse()
     {
-        var user = new UserBusinessEntity(UserId.New(), "test@example.com", "John", "Doe");
+        var user = new UserBusinessEntity(new UserId(1), "test@example.com", "John", "Doe");
 
         user.Deactivate();
 
@@ -62,7 +62,7 @@ public class UserBusinessEntityTests
     [Test]
     public void Activate_SetsIsActiveToTrue()
     {
-        var user = new UserBusinessEntity(UserId.New(), "test@example.com", "John", "Doe");
+        var user = new UserBusinessEntity(new UserId(1), "test@example.com", "John", "Doe");
         user.Deactivate();
 
         user.Activate();

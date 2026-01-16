@@ -7,8 +7,8 @@ public class IssueBusinessEntity
     public virtual string? Description { get; protected set; }
     public virtual IssueStatus Status { get; protected set; }
     public virtual IssuePriority Priority { get; protected set; }
-    public virtual Guid? AssignedUserId { get; protected set; }
-    public virtual Guid? AssignedTeamId { get; protected set; }
+    public virtual long? AssignedUserId { get; protected set; }
+    public virtual long? AssignedTeamId { get; protected set; }
     public virtual DateTime CreatedDate { get; protected set; }
     public virtual DateTime? DueDate { get; protected set; }
     public virtual DateTime? ResolvedDate { get; protected set; }
@@ -43,13 +43,13 @@ public class IssueBusinessEntity
         LastModifiedDate = DateTime.UtcNow;
     }
 
-    public virtual void AssignToUser(Guid? userId)
+    public virtual void AssignToUser(long? userId)
     {
         AssignedUserId = userId;
         LastModifiedDate = DateTime.UtcNow;
     }
 
-    public virtual void AssignToTeam(Guid? teamId)
+    public virtual void AssignToTeam(long? teamId)
     {
         AssignedTeamId = teamId;
         LastModifiedDate = DateTime.UtcNow;

@@ -10,7 +10,7 @@ namespace TicketSystem.Team.Infrastructure.Mappings;
 
 public class TeamIdType : IUserType
 {
-    public SqlType[] SqlTypes => new[] { new SqlType(DbType.String) };
+    public SqlType[] SqlTypes => new[] { new SqlType(DbType.Int64) };
 
     public Type ReturnedType => typeof(TeamId);
 
@@ -33,20 +33,20 @@ public class TeamIdType : IUserType
 
     public object NullSafeGet(DbDataReader rs, string[] names, ISessionImplementor session, object owner)
     {
-        var value = NHibernateUtil.String.NullSafeGet(rs, names[0], session);
+        var value = NHibernateUtil.Int64.NullSafeGet(rs, names[0], session);
         if (value == null) return default(TeamId);
-        return new TeamId(Guid.Parse((string)value));
+        return new TeamId((long)value);
     }
 
     public void NullSafeSet(DbCommand cmd, object value, int index, ISessionImplementor session)
     {
-        if (value == null || value is TeamId teamId && teamId.Value == Guid.Empty)
+        if (value == null || value is TeamId teamId && teamId.Value == 0)
         {
-            NHibernateUtil.String.NullSafeSet(cmd, null, index, session);
+            NHibernateUtil.Int64.NullSafeSet(cmd, null, index, session);
         }
         else
         {
-            NHibernateUtil.String.NullSafeSet(cmd, ((TeamId)value).Value.ToString(), index, session);
+            NHibernateUtil.Int64.NullSafeSet(cmd, ((TeamId)value).Value, index, session);
         }
     }
 
