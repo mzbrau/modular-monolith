@@ -1,0 +1,87 @@
+@page "/users/create"
+@using TicketSystem.Client.Services
+@inject UserGrpcClient UserClient
+@inject NavigationManager Navigation
+@rendermode InteractiveServer
+
+<PageTitle>Create User</PageTitle>
+
+<h1>Create User</h1>
+
+<div class="row">
+    <div class="col-md-6">
+        <EditForm Model="@_model" OnValidSubmit="HandleSubmit" FormName="CreateUserForm">
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" />
+
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <InputText id="email" @bind-Value="_model.Email" class="form-control" />
+                <ValidationMessage For="@(() => _model.Email)" class="text-danger" />
+            </div>
+
+            <div class="mb-3">
+                <label for="firstName" class="form-label">First Name</label>
+                <InputText id="firstName" @bind-Value="_model.FirstName" class="form-control" />
+                <ValidationMessage For="@(() => _model.FirstName)" class="text-danger" />
+            </div>
+
+            <div class="mb-3">
+                <label for="lastName" class="form-label">Last Name</label>
+                <InputText id="lastName" @bind-Value="_model.LastName" class="form-control" />
+                <ValidationMessage For="@(() => _model.LastName)" class="text-danger" />
+            </div>
+
+            @if (!string.IsNullOrEmpty(_errorMessage))
+            {
+                <div class="alert alert-danger">@_errorMessage</div>
+            }
+
+            <button type="submit" class="btn btn-primary" disabled="@_isSubmitting">
+                @if (_isSubmitting)
+                {
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    <span> Creating...</span>
+                }
+                else
+                {
+                    <span>Create User</span>
+                }
+            </button>
+            <a href="/users" class="btn btn-secondary">Cancel</a>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    private CreateUserModel _model = new();
+    private bool _isSubmitting;
+    private string? _errorMessage;
+
+    private async Task HandleSubmit()
+    {
+        _isSubmitting = true;
+        _errorMessage = null;
+
+        try
+        {
+            var userId = await UserClient.CreateUserAsync(_model.Email!, _model.FirstName!, _model.LastName!);
+            Navigation.NavigateTo($"/users/{userId}");
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = ex.Message;
+        }
+        finally
+        {
+            _isSubmitting = false;
+        }
+    }
+
+    private class CreateUserModel
+    {
+        public string? Email { get; set; }
+        public string? FirstName { get; set; }
+        public string? LastName { get; set; }
+    }
+}

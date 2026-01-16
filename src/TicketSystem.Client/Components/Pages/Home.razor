@@ -1,7 +1,37 @@
 ﻿@page "/"
 
-<PageTitle>Home</PageTitle>
+<PageTitle>Issue System</PageTitle>
 
-<h1>Hello, world!</h1>
+<h1>Issue System</h1>
 
-Welcome to your new app.
+<p class="lead">Welcome to the Issue System - a modular monolith application for managing issues, users, and teams.</p>
+
+<div class="row mt-4">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Users</h5>
+                <p class="card-text">Manage system users who can create and be assigned issues.</p>
+                <a href="/users" class="btn btn-primary">View Users</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Teams</h5>
+                <p class="card-text">Organize users into teams for collaborative work on issues.</p>
+                <a href="/teams" class="btn btn-primary">View Teams</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Issues</h5>
+                <p class="card-text">Track and manage issues with statuses, priorities, and assignments.</p>
+                <a href="/issues" class="btn btn-primary">View Issues</a>
+            </div>
+        </div>
+    </div>
+</div>

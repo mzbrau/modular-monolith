@@ -18,5 +18,7 @@
     <Project Path="UserModule/TicketSystem.User/TicketSystem.User.csproj" />
   </Folder>
   <Project Path="TicketSystem.Api/TicketSystem.Api.csproj" />
+  <Project Path="TicketSystem.AppHost/TicketSystem.AppHost.csproj" />
   <Project Path="TicketSystem.Architecture.Tests/TicketSystem.Architecture.Tests.csproj" />
+  <Project Path="TicketSystem.ServiceDefaults/TicketSystem.ServiceDefaults.csproj" />
 </Solution>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2"
+                   assembly="TicketSystem.Team"
+                   namespace="TicketSystem.Team.Domain">
+
+  <class name="TeamBusinessEntity" table="Teams" lazy="false">
+    <id name="Id" column="Id" type="TicketSystem.Team.Infrastructure.Mappings.TeamIdType, TicketSystem.Team">
+      <generator class="assigned" />
+    </id>
+    
+    <property name="Name" column="Name" not-null="true" />
+    <property name="Description" column="Description" />
+    <property name="CreatedDate" column="CreatedDate" not-null="true" />
+    
+    <bag name="MembersInternal" table="TeamMembers" cascade="all-delete-orphan" inverse="true" lazy="false">
+      <key column="TeamId" />
+      <one-to-many class="TeamMemberBusinessEntity" />
+    </bag>
+  </class>
+
+  <class name="TeamMemberBusinessEntity" table="TeamMembers" lazy="false">
+    <id name="Id" column="Id" type="TicketSystem.Team.Infrastructure.Mappings.GuidStringType, TicketSystem.Team">
+      <generator class="assigned" />
+    </id>
+    
+    <property name="UserId" column="UserId" not-null="true" type="TicketSystem.Team.Infrastructure.Mappings.GuidStringType, TicketSystem.Team" />
+    <property name="JoinedDate" column="JoinedDate" not-null="true" />
+    <property name="Role" column="Role" not-null="true" />
+    
+    <many-to-one name="Team" class="TeamBusinessEntity" column="TeamId" not-null="true" />
+  </class>
+
+</hibernate-mapping>

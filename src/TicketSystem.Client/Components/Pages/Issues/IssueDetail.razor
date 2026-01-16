@@ -1,0 +1,359 @@
+@page "/issues/{IssueId}"
+@using TicketSystem.Api.Protos
+@using TicketSystem.Client.Services
+@inject IssueGrpcClient IssueClient
+@inject UserGrpcClient UserClient
+@inject TeamGrpcClient TeamClient
+@inject NavigationManager Navigation
+@rendermode InteractiveServer
+
+<PageTitle>Issue Details</PageTitle>
+
+@if (_issue == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <h1>@_issue.Title</h1>
+
+    <div class="row">
+        <div class="col-md-8">
+            @if (_isEditing)
+            {
+                <EditForm Model="@_editModel" OnValidSubmit="HandleUpdate" FormName="EditIssueForm">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Title</label>
+                        <InputText id="title" @bind-Value="_editModel.Title" class="form-control" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <InputTextArea id="description" @bind-Value="_editModel.Description" class="form-control" rows="5" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="priority" class="form-label">Priority</label>
+                        <InputSelect id="priority" @bind-Value="_editModel.Priority" class="form-select">
+                            <option value="0">Low</option>
+                            <option value="1">Medium</option>
+                            <option value="2">High</option>
+                            <option value="3">Critical</option>
+                        </InputSelect>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="dueDate" class="form-label">Due Date</label>
+                        <InputDate id="dueDate" @bind-Value="_editModel.DueDate" class="form-control" />
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(_errorMessage))
+                    {
+                        <div class="alert alert-danger">@_errorMessage</div>
+                    }
+
+                    <button type="submit" class="btn btn-primary">Save</button>
+                    <button type="button" class="btn btn-secondary" @onclick="CancelEdit">Cancel</button>
+                </EditForm>
+            }
+            else
+            {
+                <div class="mb-4">
+                    <span class="badge @GetStatusBadgeClass(_issue.Status) me-2">@GetStatusName(_issue.Status)</span>
+                    <span class="badge @GetPriorityBadgeClass(_issue.Priority)">@GetPriorityName(_issue.Priority)</span>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-header">Description</div>
+                    <div class="card-body">
+                        <p class="card-text">@(string.IsNullOrEmpty(_issue.Description) ? "No description provided." : _issue.Description)</p>
+                    </div>
+                </div>
+
+                <dl class="row">
+                    <dt class="col-sm-3">Assigned User</dt>
+                    <dd class="col-sm-9">
+                        @if (!string.IsNullOrEmpty(_issue.AssignedUserId) && _userLookup.TryGetValue(_issue.AssignedUserId, out var user))
+                        {
+                            @user.DisplayName
+                        }
+                        else
+                        {
+                            <span class="text-muted">Unassigned</span>
+                        }
+                    </dd>
+
+                    <dt class="col-sm-3">Assigned Team</dt>
+                    <dd class="col-sm-9">
+                        @if (!string.IsNullOrEmpty(_issue.AssignedTeamId) && _teamLookup.TryGetValue(_issue.AssignedTeamId, out var team))
+                        {
+                            @team.Name
+                        }
+                        else
+                        {
+                            <span class="text-muted">None</span>
+                        }
+                    </dd>
+
+                    <dt class="col-sm-3">Due Date</dt>
+                    <dd class="col-sm-9">@(string.IsNullOrEmpty(_issue.DueDate) ? "-" : DateTime.Parse(_issue.DueDate).ToLocalTime().ToString("d"))</dd>
+
+                    <dt class="col-sm-3">Created</dt>
+                    <dd class="col-sm-9">@DateTime.Parse(_issue.CreatedDate).ToLocalTime().ToString("g")</dd>
+
+                    <dt class="col-sm-3">Last Modified</dt>
+                    <dd class="col-sm-9">@DateTime.Parse(_issue.LastModifiedDate).ToLocalTime().ToString("g")</dd>
+
+                    @if (!string.IsNullOrEmpty(_issue.ResolvedDate))
+                    {
+                        <dt class="col-sm-3">Resolved</dt>
+                        <dd class="col-sm-9">@DateTime.Parse(_issue.ResolvedDate).ToLocalTime().ToString("g")</dd>
+                    }
+                </dl>
+
+                <div class="mt-3 mb-4">
+                    <button class="btn btn-primary" @onclick="StartEdit">Edit</button>
+                    <button class="btn btn-danger" @onclick="HandleDelete">Delete</button>
+                    <a href="/issues" class="btn btn-secondary">Back to List</a>
+                </div>
+
+                <hr />
+
+                <h4>Update Status</h4>
+                <div class="btn-group mb-4" role="group">
+                    @foreach (var status in new[] { (0, "Open"), (1, "In Progress"), (2, "Blocked"), (3, "Resolved"), (4, "Closed") })
+                    {
+                        <button type="button" 
+                                class="btn @(_issue.Status == status.Item1 ? "btn-primary" : "btn-outline-primary")"
+                                @onclick="() => HandleStatusChange(status.Item1)"
+                                disabled="@(_issue.Status == status.Item1)">
+                            @status.Item2
+                        </button>
+                    }
+                </div>
+
+                <hr />
+
+                <h4>Assign To User</h4>
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <select @bind="_selectedUserId" class="form-select">
+                            <option value="">Unassigned</option>
+                            @foreach (var u in _users.Where(x => x.IsActive))
+                            {
+                                <option value="@u.Id">@u.DisplayName</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <button class="btn btn-outline-primary" @onclick="HandleAssignToUser">Assign</button>
+                    </div>
+                </div>
+
+                <h4>Assign To Team</h4>
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <select @bind="_selectedTeamId" class="form-select">
+                            <option value="">None</option>
+                            @foreach (var t in _teams)
+                            {
+                                <option value="@t.Id">@t.Name</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <button class="btn btn-outline-primary" @onclick="HandleAssignToTeam">Assign</button>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public string IssueId { get; set; } = string.Empty;
+
+    private IssueMessage? _issue;
+    private EditIssueModel _editModel = new();
+    private List<UserMessage> _users = new();
+    private List<TeamMessage> _teams = new();
+    private Dictionary<string, UserMessage> _userLookup = new();
+    private Dictionary<string, TeamMessage> _teamLookup = new();
+    private bool _isEditing;
+    private string? _errorMessage;
+    private string _selectedUserId = string.Empty;
+    private string _selectedTeamId = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var issueTask = IssueClient.GetIssueAsync(IssueId);
+        var usersTask = UserClient.ListUsersAsync();
+        var teamsTask = TeamClient.ListTeamsAsync();
+
+        await Task.WhenAll(issueTask, usersTask, teamsTask);
+
+        _issue = issueTask.Result;
+        _users = usersTask.Result;
+        _teams = teamsTask.Result;
+        _userLookup = _users.ToDictionary(u => u.Id, u => u);
+        _teamLookup = _teams.ToDictionary(t => t.Id, t => t);
+
+        if (_issue == null)
+        {
+            Navigation.NavigateTo("/issues");
+        }
+        else
+        {
+            _selectedUserId = _issue.AssignedUserId ?? string.Empty;
+            _selectedTeamId = _issue.AssignedTeamId ?? string.Empty;
+        }
+    }
+
+    private async Task LoadIssue()
+    {
+        _issue = await IssueClient.GetIssueAsync(IssueId);
+        if (_issue != null)
+        {
+            _selectedUserId = _issue.AssignedUserId ?? string.Empty;
+            _selectedTeamId = _issue.AssignedTeamId ?? string.Empty;
+        }
+    }
+
+    private void StartEdit()
+    {
+        _editModel = new EditIssueModel
+        {
+            Title = _issue!.Title,
+            Description = _issue.Description,
+            Priority = _issue.Priority,
+            DueDate = string.IsNullOrEmpty(_issue.DueDate) ? null : DateTime.Parse(_issue.DueDate).ToLocalTime()
+        };
+        _isEditing = true;
+    }
+
+    private void CancelEdit()
+    {
+        _isEditing = false;
+        _errorMessage = null;
+    }
+
+    private async Task HandleUpdate()
+    {
+        _errorMessage = null;
+
+        try
+        {
+            await IssueClient.UpdateIssueAsync(
+                IssueId,
+                _editModel.Title!,
+                _editModel.Description ?? string.Empty,
+                _editModel.Priority,
+                _editModel.DueDate);
+            await LoadIssue();
+            _isEditing = false;
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = ex.Message;
+        }
+    }
+
+    private async Task HandleStatusChange(int status)
+    {
+        try
+        {
+            await IssueClient.UpdateIssueStatusAsync(IssueId, status);
+            await LoadIssue();
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = ex.Message;
+        }
+    }
+
+    private async Task HandleAssignToUser()
+    {
+        try
+        {
+            await IssueClient.AssignIssueToUserAsync(IssueId, string.IsNullOrEmpty(_selectedUserId) ? null : _selectedUserId);
+            await LoadIssue();
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = ex.Message;
+        }
+    }
+
+    private async Task HandleAssignToTeam()
+    {
+        try
+        {
+            await IssueClient.AssignIssueToTeamAsync(IssueId, string.IsNullOrEmpty(_selectedTeamId) ? null : _selectedTeamId);
+            await LoadIssue();
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = ex.Message;
+        }
+    }
+
+    private async Task HandleDelete()
+    {
+        try
+        {
+            await IssueClient.DeleteIssueAsync(IssueId);
+            Navigation.NavigateTo("/issues");
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = ex.Message;
+        }
+    }
+
+    private string GetStatusName(int status) => status switch
+    {
+        0 => "Open",
+        1 => "In Progress",
+        2 => "Blocked",
+        3 => "Resolved",
+        4 => "Closed",
+        _ => "Unknown"
+    };
+
+    private string GetStatusBadgeClass(int status) => status switch
+    {
+        0 => "bg-info",
+        1 => "bg-primary",
+        2 => "bg-danger",
+        3 => "bg-success",
+        4 => "bg-secondary",
+        _ => "bg-light"
+    };
+
+    private string GetPriorityName(int priority) => priority switch
+    {
+        0 => "Low",
+        1 => "Medium",
+        2 => "High",
+        3 => "Critical",
+        _ => "Unknown"
+    };
+
+    private string GetPriorityBadgeClass(int priority) => priority switch
+    {
+        0 => "bg-secondary",
+        1 => "bg-info",
+        2 => "bg-warning text-dark",
+        3 => "bg-danger",
+        _ => "bg-light"
+    };
+
+    private class EditIssueModel
+    {
+        public string? Title { get; set; }
+        public string? Description { get; set; }
+        public int Priority { get; set; }
+        public DateTime? DueDate { get; set; }
+    }
+}

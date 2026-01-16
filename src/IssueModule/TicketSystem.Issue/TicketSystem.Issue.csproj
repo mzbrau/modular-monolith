@@ -7,9 +7,14 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="Application\" />
-      <Folder Include="Domain\" />
-      <Folder Include="Infrastructure\" />
+        <PackageReference Include="NHibernate" Version="5.5.2"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.0"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\TicketSystem.Issue.Contracts\TicketSystem.Issue.Contracts.csproj"/>
+        <ProjectReference Include="..\..\UserModule\TicketSystem.User.Contracts\TicketSystem.User.Contracts.csproj"/>
+        <ProjectReference Include="..\..\TeamModule\TicketSystem.Team.Contracts\TicketSystem.Team.Contracts.csproj"/>
     </ItemGroup>
 
 </Project>

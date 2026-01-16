@@ -1,0 +1,100 @@
+@page "/issues/create"
+@using TicketSystem.Client.Services
+@inject IssueGrpcClient IssueClient
+@inject NavigationManager Navigation
+@rendermode InteractiveServer
+
+<PageTitle>Create Issue</PageTitle>
+
+<h1>Create Issue</h1>
+
+<div class="row">
+    <div class="col-md-6">
+        <EditForm Model="@_model" OnValidSubmit="HandleSubmit" FormName="CreateIssueForm">
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" />
+
+            <div class="mb-3">
+                <label for="title" class="form-label">Title</label>
+                <InputText id="title" @bind-Value="_model.Title" class="form-control" />
+                <ValidationMessage For="@(() => _model.Title)" class="text-danger" />
+            </div>
+
+            <div class="mb-3">
+                <label for="description" class="form-label">Description</label>
+                <InputTextArea id="description" @bind-Value="_model.Description" class="form-control" rows="5" />
+            </div>
+
+            <div class="mb-3">
+                <label for="priority" class="form-label">Priority</label>
+                <InputSelect id="priority" @bind-Value="_model.Priority" class="form-select">
+                    <option value="0">Low</option>
+                    <option value="1">Medium</option>
+                    <option value="2">High</option>
+                    <option value="3">Critical</option>
+                </InputSelect>
+            </div>
+
+            <div class="mb-3">
+                <label for="dueDate" class="form-label">Due Date (optional)</label>
+                <InputDate id="dueDate" @bind-Value="_model.DueDate" class="form-control" />
+            </div>
+
+            @if (!string.IsNullOrEmpty(_errorMessage))
+            {
+                <div class="alert alert-danger">@_errorMessage</div>
+            }
+
+            <button type="submit" class="btn btn-primary" disabled="@_isSubmitting">
+                @if (_isSubmitting)
+                {
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    <span> Creating...</span>
+                }
+                else
+                {
+                    <span>Create Issue</span>
+                }
+            </button>
+            <a href="/issues" class="btn btn-secondary">Cancel</a>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    private CreateIssueModel _model = new() { Priority = 1 };
+    private bool _isSubmitting;
+    private string? _errorMessage;
+
+    private async Task HandleSubmit()
+    {
+        _isSubmitting = true;
+        _errorMessage = null;
+
+        try
+        {
+            var issueId = await IssueClient.CreateIssueAsync(
+                _model.Title!,
+                _model.Description ?? string.Empty,
+                _model.Priority,
+                _model.DueDate);
+            Navigation.NavigateTo($"/issues/{issueId}");
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = ex.Message;
+        }
+        finally
+        {
+            _isSubmitting = false;
+        }
+    }
+
+    private class CreateIssueModel
+    {
+        public string? Title { get; set; }
+        public string? Description { get; set; }
+        public int Priority { get; set; }
+        public DateTime? DueDate { get; set; }
+    }
+}

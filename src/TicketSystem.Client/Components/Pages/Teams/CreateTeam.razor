@@ -1,0 +1,79 @@
+@page "/teams/create"
+@using TicketSystem.Client.Services
+@inject TeamGrpcClient TeamClient
+@inject NavigationManager Navigation
+@rendermode InteractiveServer
+
+<PageTitle>Create Team</PageTitle>
+
+<h1>Create Team</h1>
+
+<div class="row">
+    <div class="col-md-6">
+        <EditForm Model="@_model" OnValidSubmit="HandleSubmit" FormName="CreateTeamForm">
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" />
+
+            <div class="mb-3">
+                <label for="name" class="form-label">Name</label>
+                <InputText id="name" @bind-Value="_model.Name" class="form-control" />
+                <ValidationMessage For="@(() => _model.Name)" class="text-danger" />
+            </div>
+
+            <div class="mb-3">
+                <label for="description" class="form-label">Description</label>
+                <InputTextArea id="description" @bind-Value="_model.Description" class="form-control" rows="3" />
+            </div>
+
+            @if (!string.IsNullOrEmpty(_errorMessage))
+            {
+                <div class="alert alert-danger">@_errorMessage</div>
+            }
+
+            <button type="submit" class="btn btn-primary" disabled="@_isSubmitting">
+                @if (_isSubmitting)
+                {
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    <span> Creating...</span>
+                }
+                else
+                {
+                    <span>Create Team</span>
+                }
+            </button>
+            <a href="/teams" class="btn btn-secondary">Cancel</a>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    private CreateTeamModel _model = new();
+    private bool _isSubmitting;
+    private string? _errorMessage;
+
+    private async Task HandleSubmit()
+    {
+        _isSubmitting = true;
+        _errorMessage = null;
+
+        try
+        {
+            var teamId = await TeamClient.CreateTeamAsync(_model.Name!, _model.Description ?? string.Empty);
+            Navigation.NavigateTo($"/teams/{teamId}");
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = ex.Message;
+        }
+        finally
+        {
+            _isSubmitting = false;
+        }
+    }
+
+    private class CreateTeamModel
+    {
+        public string? Name { get; set; }
+        public string? Description { get; set; }
+    }
+}

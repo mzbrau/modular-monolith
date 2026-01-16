@@ -7,4 +7,20 @@
         <BlazorDisableThrowNavigationException>true</BlazorDisableThrowNavigationException>
     </PropertyGroup>
 
+    <ItemGroup>
+        <PackageReference Include="Grpc.Net.Client" Version="2.64.0"/>
+        <PackageReference Include="Google.Protobuf" Version="3.28.2"/>
+        <PackageReference Include="Grpc.Tools" Version="2.64.0" PrivateAssets="all"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Protobuf Include="..\TicketSystem.Api\Protos\user_service.proto" GrpcServices="Client" Link="Protos\user_service.proto"/>
+        <Protobuf Include="..\TicketSystem.Api\Protos\team_service.proto" GrpcServices="Client" Link="Protos\team_service.proto"/>
+        <Protobuf Include="..\TicketSystem.Api\Protos\issue_service.proto" GrpcServices="Client" Link="Protos\issue_service.proto"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\TicketSystem.ServiceDefaults\TicketSystem.ServiceDefaults.csproj" />
+    </ItemGroup>
+
 </Project>

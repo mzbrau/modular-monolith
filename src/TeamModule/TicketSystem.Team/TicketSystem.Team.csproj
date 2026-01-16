@@ -6,4 +6,14 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+        <PackageReference Include="NHibernate" Version="5.5.2"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.0"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\TicketSystem.Team.Contracts\TicketSystem.Team.Contracts.csproj"/>
+        <ProjectReference Include="..\..\UserModule\TicketSystem.User.Contracts\TicketSystem.User.Contracts.csproj"/>
+    </ItemGroup>
+
 </Project>

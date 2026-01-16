@@ -7,11 +7,47 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Protobuf Include="Protos\greet.proto" GrpcServices="Server"/>
+        <Protobuf Include="Protos\user_service.proto" GrpcServices="Server"/>
+        <Protobuf Include="Protos\team_service.proto" GrpcServices="Server"/>
+        <Protobuf Include="Protos\issue_service.proto" GrpcServices="Server"/>
     </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="Grpc.AspNetCore" Version="2.64.0"/>
+        <PackageReference Include="NHibernate" Version="5.5.2"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\TicketSystem.ServiceDefaults\TicketSystem.ServiceDefaults.csproj" />
+        <ProjectReference Include="..\UserModule\TicketSystem.User\TicketSystem.User.csproj"/>
+        <ProjectReference Include="..\UserModule\TicketSystem.User.Contracts\TicketSystem.User.Contracts.csproj"/>
+        <ProjectReference Include="..\TeamModule\TicketSystem.Team\TicketSystem.Team.csproj"/>
+        <ProjectReference Include="..\TeamModule\TicketSystem.Team.Contracts\TicketSystem.Team.Contracts.csproj"/>
+        <ProjectReference Include="..\IssueModule\TicketSystem.Issue\TicketSystem.Issue.csproj"/>
+        <ProjectReference Include="..\IssueModule\TicketSystem.Issue.Contracts\TicketSystem.Issue.Contracts.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <EmbeddedResource Include="..\UserModule\TicketSystem.User\Infrastructure\Mappings\*.hbm.xml">
+            <LogicalName>%(Filename)%(Extension)</LogicalName>
+        </EmbeddedResource>
+        <EmbeddedResource Include="..\TeamModule\TicketSystem.Team\Infrastructure\Mappings\*.hbm.xml">
+            <LogicalName>%(Filename)%(Extension)</LogicalName>
+        </EmbeddedResource>
+        <EmbeddedResource Include="..\IssueModule\TicketSystem.Issue\Infrastructure\Mappings\*.hbm.xml">
+            <LogicalName>%(Filename)%(Extension)</LogicalName>
+        </EmbeddedResource>
+    </ItemGroup>
+
+<!-- M2 macs can't use the nuget package as it does not support that processor -->
+    <ItemGroup>
+        <Reference Include="System.Data.SQLite" Condition="'$(NETCoreSdkRuntimeIdentifier)' == 'osx-arm64'">
+            <HintPath>..\..\external\arm64\System.Data.SQLite.dll</HintPath>
+        </Reference>
+        <PackageReference Include="System.Data.SQLite.Core" Version="1.0.119" Condition="'$(NETCoreSdkRuntimeIdentifier)' != 'osx-arm64'" />
+        <None Include="..\..\external\arm64\SQLite.Interop.dll" Condition="'$(NETCoreSdkRuntimeIdentifier)' == 'osx-arm64'">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
     </ItemGroup>
 
 </Project>

@@ -14,10 +14,20 @@
         <PackageReference Include="NUnit" Version="4.3.2"/>
         <PackageReference Include="NUnit.Analyzers" Version="4.7.0"/>
         <PackageReference Include="NUnit3TestAdapter" Version="5.0.0"/>
+        <PackageReference Include="NetArchTest.Rules" Version="1.3.2"/>
     </ItemGroup>
 
     <ItemGroup>
         <Using Include="NUnit.Framework"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\UserModule\TicketSystem.User\TicketSystem.User.csproj"/>
+        <ProjectReference Include="..\UserModule\TicketSystem.User.Contracts\TicketSystem.User.Contracts.csproj"/>
+        <ProjectReference Include="..\TeamModule\TicketSystem.Team\TicketSystem.Team.csproj"/>
+        <ProjectReference Include="..\TeamModule\TicketSystem.Team.Contracts\TicketSystem.Team.Contracts.csproj"/>
+        <ProjectReference Include="..\IssueModule\TicketSystem.Issue\TicketSystem.Issue.csproj"/>
+        <ProjectReference Include="..\IssueModule\TicketSystem.Issue.Contracts\TicketSystem.Issue.Contracts.csproj"/>
     </ItemGroup>
 
 </Project>

@@ -1,0 +1,68 @@
+@page "/users"
+@using TicketSystem.Api.Protos
+@using TicketSystem.Client.Services
+@inject UserGrpcClient UserClient
+@rendermode InteractiveServer
+
+<PageTitle>Users</PageTitle>
+
+<h1>Users</h1>
+
+<div class="mb-3">
+    <a href="/users/create" class="btn btn-primary">Create New User</a>
+</div>
+
+@if (_users == null)
+{
+    <p><em>Loading...</em></p>
+}
+else if (_users.Count == 0)
+{
+    <p>No users found.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Status</th>
+                <th>Created</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in _users)
+            {
+                <tr>
+                    <td>@user.DisplayName</td>
+                    <td>@user.Email</td>
+                    <td>
+                        @if (user.IsActive)
+                        {
+                            <span class="badge bg-success">Active</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">Inactive</span>
+                        }
+                    </td>
+                    <td>@DateTime.Parse(user.CreatedDate).ToLocalTime().ToString("g")</td>
+                    <td>
+                        <a href="/users/@user.Id" class="btn btn-sm btn-outline-primary">View</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<UserMessage>? _users;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _users = await UserClient.ListUsersAsync();
+    }
+}
