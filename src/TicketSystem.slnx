@@ -1,0 +1,22 @@
+<Solution>
+  <Folder Name="/Client/">
+    <Project Path="TicketSystem.Client/TicketSystem.Client.csproj" />
+  </Folder>
+  <Folder Name="/IssueModule/">
+    <Project Path="IssueModule/TicketSystem.Issue.Contracts/TicketSystem.Issue.Contracts.csproj" />
+    <Project Path="IssueModule/TicketSystem.Issue.Tests/TicketSystem.Issue.Tests.csproj" />
+    <Project Path="IssueModule/TicketSystem.Issue/TicketSystem.Issue.csproj" />
+  </Folder>
+  <Folder Name="/TeamModule/">
+    <Project Path="TeamModule/TicketSystem.Team/TicketSystem.Team.csproj" />
+    <Project Path="TeamModule/TicketSystem.Team.Contracts/TicketSystem.Team.Contracts.csproj" />
+    <Project Path="TeamModule/TicketSystem.Team.Tests/TicketSystem.Team.Tests.csproj" />
+  </Folder>
+  <Folder Name="/UserModule/">
+    <Project Path="UserModule/TicketSystem.User.Contracts/TicketSystem.User.Contracts.csproj" />
+    <Project Path="UserModule/TicketSystem.User.Tests/TicketSystem.User.Tests.csproj" />
+    <Project Path="UserModule/TicketSystem.User/TicketSystem.User.csproj" />
+  </Folder>
+  <Project Path="TicketSystem.Api/TicketSystem.Api.csproj" />
+  <Project Path="TicketSystem.Architecture.Tests/TicketSystem.Architecture.Tests.csproj" />
+</Solution>
