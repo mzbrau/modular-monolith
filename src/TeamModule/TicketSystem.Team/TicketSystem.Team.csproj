@@ -21,4 +21,10 @@
         <ProjectReference Include="..\..\UserModule\TicketSystem.User.Contracts\TicketSystem.User.Contracts.csproj"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <EmbeddedResource Include="Infrastructure\Mappings\*.hbm.xml">
+            <LogicalName>%(Filename)%(Extension)</LogicalName>
+        </EmbeddedResource>
+    </ItemGroup>
+
 </Project>

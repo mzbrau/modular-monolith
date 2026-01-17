@@ -20,17 +20,7 @@
         <ProjectReference Include="..\IssueModule\TicketSystem.Issue.Contracts\TicketSystem.Issue.Contracts.csproj"/>
     </ItemGroup>
 
-    <ItemGroup>
-        <EmbeddedResource Include="..\UserModule\TicketSystem.User\Infrastructure\Mappings\*.hbm.xml">
-            <LogicalName>%(Filename)%(Extension)</LogicalName>
-        </EmbeddedResource>
-        <EmbeddedResource Include="..\TeamModule\TicketSystem.Team\Infrastructure\Mappings\*.hbm.xml">
-            <LogicalName>%(Filename)%(Extension)</LogicalName>
-        </EmbeddedResource>
-        <EmbeddedResource Include="..\IssueModule\TicketSystem.Issue\Infrastructure\Mappings\*.hbm.xml">
-            <LogicalName>%(Filename)%(Extension)</LogicalName>
-        </EmbeddedResource>
-    </ItemGroup>
+
 
 <!-- M2 macs can't use the nuget package as it does not support that processor -->
     <ItemGroup>

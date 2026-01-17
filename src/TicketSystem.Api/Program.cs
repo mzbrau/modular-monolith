@@ -16,7 +16,12 @@ var dbPath = Path.Combine(builder.Environment.ContentRootPath, "TicketSystem.db"
 var connectionString = $"Data Source={dbPath};Version=3;";
 logger.LogInformation("Database path: {DatabasePath}", dbPath);
 
-var sessionFactory = NHibernateConfiguration.CreateSessionFactory(connectionString);
+var sessionFactory = NHibernateConfiguration.CreateSessionFactory(connectionString, new[]
+{
+    typeof(UserModuleRegistration).Assembly,
+    typeof(TeamModuleRegistration).Assembly,
+    typeof(IssueModuleRegistration).Assembly
+});
 
 builder.Services.AddSingleton(sessionFactory);
 builder.Services.AddSingleton(new DatabaseOptions(connectionString));

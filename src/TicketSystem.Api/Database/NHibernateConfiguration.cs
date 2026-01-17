@@ -7,7 +7,7 @@ namespace TicketSystem.Api.Database;
 
 public static class NHibernateConfiguration
 {
-    public static ISessionFactory CreateSessionFactory(string connectionString)
+    public static ISessionFactory CreateSessionFactory(string connectionString, IEnumerable<System.Reflection.Assembly> assembliesToScan)
     {
         var configuration = new Configuration();
         
@@ -20,17 +20,9 @@ public static class NHibernateConfiguration
             db.LogFormattedSql = true;
         });
 
-        // Load all embedded mapping files from the API assembly
-        var assembly = typeof(NHibernateConfiguration).Assembly;
-        var resourceNames = assembly.GetManifestResourceNames();
-        
-        foreach (var resourceName in resourceNames.Where(r => r.EndsWith(".hbm.xml")))
+        foreach (var assembly in assembliesToScan)
         {
-            using var stream = assembly.GetManifestResourceStream(resourceName);
-            if (stream != null)
-            {
-                configuration.AddInputStream(stream);
-            }
+            configuration.AddAssembly(assembly);
         }
 
         return configuration.BuildSessionFactory();
