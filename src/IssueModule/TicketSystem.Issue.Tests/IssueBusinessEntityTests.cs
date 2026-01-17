@@ -8,7 +8,7 @@ public class IssueBusinessEntityTests
     [Test]
     public void Constructor_WithValidData_CreatesIssue()
     {
-        var issueId = new IssueId(1);
+        var issueId = 1L;
         const string title = "Bug in login";
         const string description = "Users cannot login";
         var priority = IssuePriority.High;
@@ -30,13 +30,13 @@ public class IssueBusinessEntityTests
     public void Constructor_WithEmptyTitle_ThrowsArgumentException()
     {
         Assert.Throws<ArgumentException>(() =>
-            new IssueBusinessEntity(new IssueId(1), "", "Description", IssuePriority.Medium, null));
+            new IssueBusinessEntity(1L, "", "Description", IssuePriority.Medium, null));
     }
 
     [Test]
     public void Update_WithValidData_UpdatesIssue()
     {
-        var issue = new IssueBusinessEntity(new IssueId(1), "Old Title", "Old Description", IssuePriority.Low, null);
+        var issue = new IssueBusinessEntity(1L, "Old Title", "Old Description", IssuePriority.Low, null);
         var newDueDate = DateTime.UtcNow.AddDays(14);
 
         issue.Update("New Title", "New Description", IssuePriority.Critical, newDueDate);
@@ -50,7 +50,7 @@ public class IssueBusinessEntityTests
     [Test]
     public void UpdateStatus_ToResolved_SetsResolvedDate()
     {
-        var issue = new IssueBusinessEntity(new IssueId(1), "Bug", "Description", IssuePriority.Medium, null);
+        var issue = new IssueBusinessEntity(1L, "Bug", "Description", IssuePriority.Medium, null);
 
         issue.UpdateStatus(IssueStatus.Resolved);
 
@@ -61,7 +61,7 @@ public class IssueBusinessEntityTests
     [Test]
     public void UpdateStatus_FromResolvedToInProgress_ClearsResolvedDate()
     {
-        var issue = new IssueBusinessEntity(new IssueId(1), "Bug", "Description", IssuePriority.Medium, null);
+        var issue = new IssueBusinessEntity(1L, "Bug", "Description", IssuePriority.Medium, null);
         issue.UpdateStatus(IssueStatus.Resolved);
 
         issue.UpdateStatus(IssueStatus.InProgress);
@@ -73,7 +73,7 @@ public class IssueBusinessEntityTests
     [Test]
     public void AssignToUser_SetsAssignedUserId()
     {
-        var issue = new IssueBusinessEntity(new IssueId(1), "Bug", "Description", IssuePriority.Medium, null);
+        var issue = new IssueBusinessEntity(1L, "Bug", "Description", IssuePriority.Medium, null);
         long userId = 1;
 
         issue.AssignToUser(userId);
@@ -84,7 +84,7 @@ public class IssueBusinessEntityTests
     [Test]
     public void AssignToTeam_SetsAssignedTeamId()
     {
-        var issue = new IssueBusinessEntity(new IssueId(1), "Bug", "Description", IssuePriority.Medium, null);
+        var issue = new IssueBusinessEntity(1L, "Bug", "Description", IssuePriority.Medium, null);
         long teamId = 1;
 
         issue.AssignToTeam(teamId);

@@ -2,7 +2,7 @@ namespace TicketSystem.Issue.Domain;
 
 public class IssueBusinessEntity
 {
-    public virtual IssueId Id { get; protected set; }
+    public virtual long Id { get; protected set; }
     public virtual string Title { get; protected set; } = string.Empty;
     public virtual string? Description { get; protected set; }
     public virtual IssueStatus Status { get; protected set; }
@@ -16,7 +16,7 @@ public class IssueBusinessEntity
 
     protected IssueBusinessEntity() { }
 
-    public IssueBusinessEntity(IssueId id, string title, string? description, IssuePriority priority, DateTime? dueDate)
+    public IssueBusinessEntity(long id, string title, string? description, IssuePriority priority, DateTime? dueDate)
     {
         if (string.IsNullOrWhiteSpace(title))
             throw new ArgumentException("Title cannot be empty.", nameof(title));

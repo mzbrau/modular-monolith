@@ -2,14 +2,14 @@ namespace TicketSystem.Issue.Contracts;
 
 public interface IIssueModuleApi
 {
-    Task<long> CreateIssueAsync(string title, string? description, int priority, DateTime? dueDate);
-    Task<IssueDataContract?> GetIssueAsync(long issueId);
+    Task<CreateIssueResponse> CreateIssueAsync(CreateIssueRequest request);
+    Task<IssueDataContract?> GetIssueAsync(GetIssueRequest request);
     Task<List<IssueDataContract>> GetAllIssuesAsync();
-    Task UpdateIssueAsync(long issueId, string title, string? description, int priority, DateTime? dueDate);
-    Task AssignIssueToUserAsync(long issueId, long? userId);
-    Task AssignIssueToTeamAsync(long issueId, long? teamId);
-    Task UpdateIssueStatusAsync(long issueId, int status);
-    Task<List<IssueDataContract>> GetIssuesByUserAsync(long userId);
-    Task<List<IssueDataContract>> GetIssuesByTeamAsync(long teamId);
-    Task DeleteIssueAsync(long issueId);
+    Task UpdateIssueAsync(UpdateIssueRequest request);
+    Task AssignIssueToUserAsync(AssignIssueToUserRequest request);
+    Task AssignIssueToTeamAsync(AssignIssueToTeamRequest request);
+    Task UpdateIssueStatusAsync(UpdateIssueStatusRequest request);
+    Task<List<IssueDataContract>> GetIssuesByUserAsync(GetIssuesByUserRequest request);
+    Task<List<IssueDataContract>> GetIssuesByTeamAsync(GetIssuesByTeamRequest request);
+    Task DeleteIssueAsync(DeleteIssueRequest request);
 }

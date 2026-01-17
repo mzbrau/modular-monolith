@@ -1,8 +1,8 @@
 using NHibernate;
 using TicketSystem.Api.Database;
-using TicketSystem.Issue.Registration;
-using TicketSystem.Team.Registration;
-using TicketSystem.User.Registration;
+using TicketSystem.Issue.Infrastructure.Registration;
+using TicketSystem.Team.Infrastructure.Registration;
+using TicketSystem.User.Infrastructure.Registration;
 
 var builder = WebApplication.CreateBuilder(args);
 

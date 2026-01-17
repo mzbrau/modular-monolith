@@ -12,16 +12,7 @@ internal class TeamRepository : ITeamRepository
         _session = session;
     }
 
-    public async Task<TeamId> GetNextIdAsync()
-    {
-        var maxId = await _session.QueryOver<TeamBusinessEntity>()
-            .Select(NHibernate.Criterion.Projections.Max<TeamBusinessEntity>(t => t.Id))
-            .SingleOrDefaultAsync<TeamId>();
-        
-        return new TeamId(maxId.Value + 1);
-    }
-
-    public async Task<TeamBusinessEntity?> GetByIdAsync(TeamId id)
+    public async Task<TeamBusinessEntity?> GetByIdAsync(long id)
     {
         return await _session.GetAsync<TeamBusinessEntity>(id);
     }
@@ -33,7 +24,7 @@ internal class TeamRepository : ITeamRepository
         return teams.ToList();
     }
 
-    public async Task<bool> ExistsAsync(TeamId id)
+    public async Task<bool> ExistsAsync(long id)
     {
         var count = await _session.QueryOver<TeamBusinessEntity>()
             .Where(t => t.Id == id)

@@ -25,7 +25,6 @@ public class UserServiceTests
         const string firstName = "John";
         const string lastName = "Doe";
         
-        _userRepository.GetNextIdAsync().Returns(new UserId(1));
         _userRepository.GetByEmailAsync(email).Returns((UserBusinessEntity?)null);
         _userRepository.AddAsync(Arg.Any<UserBusinessEntity>()).Returns(Task.CompletedTask);
 
@@ -33,7 +32,7 @@ public class UserServiceTests
         var userId = await _userService.CreateUserAsync(email, firstName, lastName);
 
         // Assert
-        Assert.That(userId.Value, Is.EqualTo(1));
+        Assert.That(userId, Is.EqualTo(0)); // ID is 0 before saving
         await _userRepository.Received(1).AddAsync(Arg.Is<UserBusinessEntity>(u => 
             u.Email == email && u.FirstName == firstName && u.LastName == lastName));
     }
@@ -43,7 +42,7 @@ public class UserServiceTests
     {
         // Arrange
         const string email = "existing@example.com";
-        var existingUser = new UserBusinessEntity(new UserId(1), email, "Jane", "Doe");
+        var existingUser = new UserBusinessEntity(1, email, "Jane", "Doe");
         
         _userRepository.GetByEmailAsync(email).Returns(existingUser);
 
@@ -56,7 +55,7 @@ public class UserServiceTests
     public async Task GetUserAsync_WithExistingUser_ReturnsUser()
     {
         // Arrange
-        var userId = new UserId(1);
+        const long userId = 1;
         var user = new UserBusinessEntity(userId, "test@example.com", "John", "Doe");
         
         _userRepository.GetByIdAsync(userId).Returns(user);
@@ -72,7 +71,7 @@ public class UserServiceTests
     public async Task GetUserAsync_WithNonExistingUser_ThrowsKeyNotFoundException()
     {
         // Arrange
-        var userId = new UserId(1);
+        const long userId = 1;
         _userRepository.GetByIdAsync(userId).Returns((UserBusinessEntity?)null);
 
         // Act & Assert
@@ -84,7 +83,7 @@ public class UserServiceTests
     public async Task UpdateUserAsync_WithValidData_UpdatesUser()
     {
         // Arrange
-        var userId = new UserId(1);
+        const long userId = 1;
         var user = new UserBusinessEntity(userId, "test@example.com", "John", "Doe");
         
         _userRepository.GetByIdAsync(userId).Returns(user);
@@ -103,7 +102,7 @@ public class UserServiceTests
     public async Task DeactivateUserAsync_WithExistingUser_DeactivatesUser()
     {
         // Arrange
-        var userId = new UserId(1);
+        const long userId = 1;
         var user = new UserBusinessEntity(userId, "test@example.com", "John", "Doe");
         
         _userRepository.GetByIdAsync(userId).Returns(user);
@@ -121,7 +120,7 @@ public class UserServiceTests
     public async Task UserExistsAsync_WithExistingUser_ReturnsTrue()
     {
         // Arrange
-        var userId = new UserId(1);
+        const long userId = 1;
         _userRepository.ExistsAsync(userId).Returns(true);
 
         // Act

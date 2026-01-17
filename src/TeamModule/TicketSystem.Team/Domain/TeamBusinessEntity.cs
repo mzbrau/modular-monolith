@@ -2,7 +2,7 @@ namespace TicketSystem.Team.Domain;
 
 public class TeamBusinessEntity
 {
-    public virtual TeamId Id { get; protected set; }
+    public virtual long Id { get; protected set; }
     public virtual string Name { get; protected set; } = string.Empty;
     public virtual string? Description { get; protected set; }
     public virtual DateTime CreatedDate { get; protected set; }
@@ -12,7 +12,7 @@ public class TeamBusinessEntity
 
     protected TeamBusinessEntity() { }
 
-    public TeamBusinessEntity(TeamId id, string name, string? description)
+    public TeamBusinessEntity(long id, string name, string? description)
     {
         if (string.IsNullOrWhiteSpace(name))
             throw new ArgumentException("Name cannot be empty.", nameof(name));

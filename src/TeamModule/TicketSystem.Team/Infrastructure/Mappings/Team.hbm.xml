@@ -4,8 +4,8 @@
                    namespace="TicketSystem.Team.Domain">
 
   <class name="TeamBusinessEntity" table="Teams" lazy="false">
-    <id name="Id" column="Id" type="TicketSystem.Team.Infrastructure.Mappings.TeamIdType, TicketSystem.Team">
-      <generator class="assigned" />
+    <id name="Id" column="Id" type="Int64">
+      <generator class="native" />
     </id>
     
     <property name="Name" column="Name" not-null="true" />

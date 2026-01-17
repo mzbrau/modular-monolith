@@ -4,8 +4,8 @@
                    namespace="TicketSystem.Issue.Domain">
 
   <class name="IssueBusinessEntity" table="Issues" lazy="false">
-    <id name="Id" column="Id" type="TicketSystem.Issue.Infrastructure.Mappings.IssueIdType, TicketSystem.Issue">
-      <generator class="assigned" />
+    <id name="Id" column="Id" type="Int64">
+      <generator class="native" />
     </id>
 
     <property name="Title" column="Title" not-null="true" />

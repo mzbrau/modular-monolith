@@ -6,9 +6,9 @@ namespace TicketSystem.Architecture.Tests;
 [TestFixture]
 public class ModuleBoundaryTests
 {
-    private static readonly Assembly UserModuleAssembly = typeof(User.Domain.UserId).Assembly;
-    private static readonly Assembly TeamModuleAssembly = typeof(Team.Domain.TeamId).Assembly;
-    private static readonly Assembly IssueModuleAssembly = typeof(Issue.Domain.IssueId).Assembly;
+    private static readonly Assembly UserModuleAssembly = typeof(User.Domain.UserBusinessEntity).Assembly;
+    private static readonly Assembly TeamModuleAssembly = typeof(Team.Domain.TeamBusinessEntity).Assembly;
+    private static readonly Assembly IssueModuleAssembly = typeof(Issue.Domain.IssueBusinessEntity).Assembly;
 
     [Test]
     public void UserModule_ShouldNotReference_TeamModule()
@@ -18,8 +18,14 @@ public class ModuleBoundaryTests
             .HaveDependencyOn("TicketSystem.Team")
             .GetResult();
 
-        Assert.That(result.IsSuccessful, Is.True,
-            "User module should not reference Team module");
+        var errorMessage = "User module should not reference Team module";
+        if (!result.IsSuccessful && result.FailingTypes != null)
+        {
+            var failingTypes = string.Join("\n  - ", result.FailingTypes.Select(t => t.FullName));
+            errorMessage += $"\n\nFailing types:\n  - {failingTypes}";
+        }
+
+        Assert.That(result.IsSuccessful, Is.True, errorMessage);
     }
 
     [Test]
@@ -30,8 +36,14 @@ public class ModuleBoundaryTests
             .HaveDependencyOn("TicketSystem.Issue")
             .GetResult();
 
-        Assert.That(result.IsSuccessful, Is.True,
-            "User module should not reference Issue module");
+        var errorMessage = "User module should not reference Issue module";
+        if (!result.IsSuccessful && result.FailingTypes != null)
+        {
+            var failingTypes = string.Join("\n  - ", result.FailingTypes.Select(t => t.FullName));
+            errorMessage += $"\n\nFailing types:\n  - {failingTypes}";
+        }
+
+        Assert.That(result.IsSuccessful, Is.True, errorMessage);
     }
 
     [Test]
@@ -42,8 +54,14 @@ public class ModuleBoundaryTests
             .HaveDependencyOn("TicketSystem.Issue")
             .GetResult();
 
-        Assert.That(result.IsSuccessful, Is.True,
-            "Team module should not reference Issue module");
+        var errorMessage = "Team module should not reference Issue module";
+        if (!result.IsSuccessful && result.FailingTypes != null)
+        {
+            var failingTypes = string.Join("\n  - ", result.FailingTypes.Select(t => t.FullName));
+            errorMessage += $"\n\nFailing types:\n  - {failingTypes}";
+        }
+
+        Assert.That(result.IsSuccessful, Is.True, errorMessage);
     }
 
     [Test]
@@ -54,8 +72,14 @@ public class ModuleBoundaryTests
             .HaveDependencyOn("TicketSystem.User.Domain")
             .GetResult();
 
-        Assert.That(result.IsSuccessful, Is.True,
-            "Team module should not reference User.Domain directly");
+        var errorMessage = "Team module should not reference User.Domain directly";
+        if (!result.IsSuccessful && result.FailingTypes != null)
+        {
+            var failingTypes = string.Join("\n  - ", result.FailingTypes.Select(t => t.FullName));
+            errorMessage += $"\n\nFailing types:\n  - {failingTypes}";
+        }
+
+        Assert.That(result.IsSuccessful, Is.True, errorMessage);
     }
 
     [Test]
@@ -66,8 +90,14 @@ public class ModuleBoundaryTests
             .HaveDependencyOn("TicketSystem.User.Application")
             .GetResult();
 
-        Assert.That(result.IsSuccessful, Is.True,
-            "Team module should not reference User.Application directly");
+        var errorMessage = "Team module should not reference User.Application directly";
+        if (!result.IsSuccessful && result.FailingTypes != null)
+        {
+            var failingTypes = string.Join("\n  - ", result.FailingTypes.Select(t => t.FullName));
+            errorMessage += $"\n\nFailing types:\n  - {failingTypes}";
+        }
+
+        Assert.That(result.IsSuccessful, Is.True, errorMessage);
     }
 
     [Test]
@@ -78,8 +108,14 @@ public class ModuleBoundaryTests
             .HaveDependencyOn("TicketSystem.User.Domain")
             .GetResult();
 
-        Assert.That(result.IsSuccessful, Is.True,
-            "Issue module should not reference User.Domain directly");
+        var errorMessage = "Issue module should not reference User.Domain directly";
+        if (!result.IsSuccessful && result.FailingTypes != null)
+        {
+            var failingTypes = string.Join("\n  - ", result.FailingTypes.Select(t => t.FullName));
+            errorMessage += $"\n\nFailing types:\n  - {failingTypes}";
+        }
+
+        Assert.That(result.IsSuccessful, Is.True, errorMessage);
     }
 
     [Test]
@@ -90,8 +126,14 @@ public class ModuleBoundaryTests
             .HaveDependencyOn("TicketSystem.User.Application")
             .GetResult();
 
-        Assert.That(result.IsSuccessful, Is.True,
-            "Issue module should not reference User.Application directly");
+        var errorMessage = "Issue module should not reference User.Application directly";
+        if (!result.IsSuccessful && result.FailingTypes != null)
+        {
+            var failingTypes = string.Join("\n  - ", result.FailingTypes.Select(t => t.FullName));
+            errorMessage += $"\n\nFailing types:\n  - {failingTypes}";
+        }
+
+        Assert.That(result.IsSuccessful, Is.True, errorMessage);
     }
 
     [Test]
@@ -102,8 +144,14 @@ public class ModuleBoundaryTests
             .HaveDependencyOn("TicketSystem.Team.Domain")
             .GetResult();
 
-        Assert.That(result.IsSuccessful, Is.True,
-            "Issue module should not reference Team.Domain directly");
+        var errorMessage = "Issue module should not reference Team.Domain directly";
+        if (!result.IsSuccessful && result.FailingTypes != null)
+        {
+            var failingTypes = string.Join("\n  - ", result.FailingTypes.Select(t => t.FullName));
+            errorMessage += $"\n\nFailing types:\n  - {failingTypes}";
+        }
+
+        Assert.That(result.IsSuccessful, Is.True, errorMessage);
     }
 
     [Test]
@@ -114,7 +162,13 @@ public class ModuleBoundaryTests
             .HaveDependencyOn("TicketSystem.Team.Application")
             .GetResult();
 
-        Assert.That(result.IsSuccessful, Is.True,
-            "Issue module should not reference Team.Application directly");
+        var errorMessage = "Issue module should not reference Team.Application directly";
+        if (!result.IsSuccessful && result.FailingTypes != null)
+        {
+            var failingTypes = string.Join("\n  - ", result.FailingTypes.Select(t => t.FullName));
+            errorMessage += $"\n\nFailing types:\n  - {failingTypes}";
+        }
+
+        Assert.That(result.IsSuccessful, Is.True, errorMessage);
     }
 }

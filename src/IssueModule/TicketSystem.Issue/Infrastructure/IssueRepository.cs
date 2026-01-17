@@ -13,16 +13,7 @@ internal class IssueRepository : IIssueRepository
         _session = session;
     }
 
-    public async Task<IssueId> GetNextIdAsync()
-    {
-        var maxId = await _session.QueryOver<IssueBusinessEntity>()
-            .Select(Projections.Max<IssueBusinessEntity>(i => i.Id))
-            .SingleOrDefaultAsync<IssueId>();
-        
-        return new IssueId(maxId.Value + 1);
-    }
-
-    public async Task<IssueBusinessEntity?> GetByIdAsync(IssueId id)
+    public async Task<IssueBusinessEntity?> GetByIdAsync(long id)
     {
         return await _session.GetAsync<IssueBusinessEntity>(id);
     }
@@ -53,7 +44,7 @@ internal class IssueRepository : IIssueRepository
         return issues.ToList();
     }
 
-    public async Task<bool> ExistsAsync(IssueId id)
+    public async Task<bool> ExistsAsync(long id)
     {
         var issue = await GetByIdAsync(id);
         return issue != null;

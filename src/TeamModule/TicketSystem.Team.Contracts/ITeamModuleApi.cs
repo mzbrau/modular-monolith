@@ -2,13 +2,13 @@ namespace TicketSystem.Team.Contracts;
 
 public interface ITeamModuleApi
 {
-    Task<long> CreateTeamAsync(string name, string? description);
-    Task<TeamDataContract?> GetTeamAsync(long teamId);
+    Task<CreateTeamResponse> CreateTeamAsync(CreateTeamRequest request);
+    Task<TeamDataContract?> GetTeamAsync(GetTeamRequest request);
     Task<List<TeamDataContract>> GetAllTeamsAsync();
-    Task UpdateTeamAsync(long teamId, string name, string? description);
-    Task AddMemberToTeamAsync(long teamId, long userId, int role);
-    Task RemoveMemberFromTeamAsync(long teamId, long userId);
-    Task<List<TeamMemberDataContract>> GetTeamMembersAsync(long teamId);
-    Task<bool> TeamExistsAsync(long teamId);
-    Task<List<long>> GetTeamMemberIdsAsync(long teamId);
+    Task UpdateTeamAsync(UpdateTeamRequest request);
+    Task AddMemberToTeamAsync(AddMemberToTeamRequest request);
+    Task RemoveMemberFromTeamAsync(RemoveMemberFromTeamRequest request);
+    Task<List<TeamMemberDataContract>> GetTeamMembersAsync(GetTeamMembersRequest request);
+    Task<bool> TeamExistsAsync(TeamExistsRequest request);
+    Task<List<long>> GetTeamMemberIdsAsync(GetTeamMemberIdsRequest request);
 }

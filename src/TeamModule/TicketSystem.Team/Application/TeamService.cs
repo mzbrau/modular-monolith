@@ -14,17 +14,16 @@ internal class TeamService
         _userModuleApi = userModuleApi;
     }
 
-    public async Task<TeamId> CreateTeamAsync(string name, string? description)
+    public async Task<long> CreateTeamAsync(string name, string? description)
     {
-        var teamId = await _teamRepository.GetNextIdAsync();
-        var team = new TeamBusinessEntity(teamId, name, description);
+        var team = new TeamBusinessEntity(0, name, description);
         
         await _teamRepository.AddAsync(team);
         
-        return teamId;
+        return team.Id;
     }
 
-    public async Task<TeamBusinessEntity> GetTeamAsync(TeamId teamId)
+    public async Task<TeamBusinessEntity> GetTeamAsync(long teamId)
     {
         var team = await _teamRepository.GetByIdAsync(teamId);
         if (team == null)
@@ -38,7 +37,7 @@ internal class TeamService
         return await _teamRepository.GetAllAsync();
     }
 
-    public async Task UpdateTeamAsync(TeamId teamId, string name, string? description)
+    public async Task UpdateTeamAsync(long teamId, string name, string? description)
     {
         var team = await _teamRepository.GetByIdAsync(teamId);
         if (team == null)
@@ -48,14 +47,14 @@ internal class TeamService
         await _teamRepository.UpdateAsync(team);
     }
 
-    public async Task AddMemberToTeamAsync(TeamId teamId, long userId, TeamRole role = TeamRole.Member)
+    public async Task AddMemberToTeamAsync(long teamId, long userId, TeamRole role = TeamRole.Member)
     {
         var team = await _teamRepository.GetByIdAsync(teamId);
         if (team == null)
             throw new KeyNotFoundException($"Team with ID '{teamId}' not found.");
 
         // Validate user exists via User module
-        var userExists = await _userModuleApi.UserExistsAsync(userId);
+        var userExists = await _userModuleApi.UserExistsAsync(new UserExistsRequest { UserId = userId });
         if (!userExists)
             throw new InvalidOperationException($"User with ID '{userId}' does not exist.");
 
@@ -63,7 +62,7 @@ internal class TeamService
         await _teamRepository.UpdateAsync(team);
     }
 
-    public async Task RemoveMemberFromTeamAsync(TeamId teamId, long userId)
+    public async Task RemoveMemberFromTeamAsync(long teamId, long userId)
     {
         var team = await _teamRepository.GetByIdAsync(teamId);
         if (team == null)
@@ -73,7 +72,7 @@ internal class TeamService
         await _teamRepository.UpdateAsync(team);
     }
 
-    public async Task<IReadOnlyList<TeamMemberBusinessEntity>> GetTeamMembersAsync(TeamId teamId)
+    public async Task<IReadOnlyList<TeamMemberBusinessEntity>> GetTeamMembersAsync(long teamId)
     {
         var team = await _teamRepository.GetByIdAsync(teamId);
         if (team == null)
@@ -82,12 +81,12 @@ internal class TeamService
         return team.Members;
     }
 
-    public async Task<bool> TeamExistsAsync(TeamId teamId)
+    public async Task<bool> TeamExistsAsync(long teamId)
     {
         return await _teamRepository.ExistsAsync(teamId);
     }
 
-    public async Task<IReadOnlyList<long>> GetTeamMemberIdsAsync(TeamId teamId)
+    public async Task<IReadOnlyList<long>> GetTeamMemberIdsAsync(long teamId)
     {
         var team = await _teamRepository.GetByIdAsync(teamId);
         if (team == null)

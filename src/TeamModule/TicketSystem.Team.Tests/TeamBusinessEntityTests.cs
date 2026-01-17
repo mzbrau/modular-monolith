@@ -8,7 +8,7 @@ public class TeamBusinessEntityTests
     [Test]
     public void Constructor_WithValidData_CreatesTeam()
     {
-        var teamId = new TeamId(1);
+        const long teamId = 1;
         const string name = "Dev Team";
         const string description = "Development team";
 
@@ -24,13 +24,13 @@ public class TeamBusinessEntityTests
     public void Constructor_WithEmptyName_ThrowsArgumentException()
     {
         Assert.Throws<ArgumentException>(() =>
-            new TeamBusinessEntity(new TeamId(1), "", "Description"));
+            new TeamBusinessEntity(1, "", "Description"));
     }
 
     [Test]
     public void AddMember_WithNewUser_AddsMemberToTeam()
     {
-        var team = new TeamBusinessEntity(new TeamId(1), "Dev Team", "Description");
+        var team = new TeamBusinessEntity(1, "Dev Team", "Description");
         long userId = 1;
 
         var member = team.AddMember(userId, TeamRole.Lead);
@@ -43,7 +43,7 @@ public class TeamBusinessEntityTests
     [Test]
     public void AddMember_WithExistingUser_ThrowsInvalidOperationException()
     {
-        var team = new TeamBusinessEntity(new TeamId(1), "Dev Team", "Description");
+        var team = new TeamBusinessEntity(1, "Dev Team", "Description");
         long userId = 1;
         team.AddMember(userId);
 
@@ -53,7 +53,7 @@ public class TeamBusinessEntityTests
     [Test]
     public void RemoveMember_WithExistingMember_RemovesMemberFromTeam()
     {
-        var team = new TeamBusinessEntity(new TeamId(1), "Dev Team", "Description");
+        var team = new TeamBusinessEntity(1, "Dev Team", "Description");
         long userId = 1;
         team.AddMember(userId);
 
@@ -65,7 +65,7 @@ public class TeamBusinessEntityTests
     [Test]
     public void RemoveMember_WithNonExistingMember_ThrowsInvalidOperationException()
     {
-        var team = new TeamBusinessEntity(new TeamId(1), "Dev Team", "Description");
+        var team = new TeamBusinessEntity(1, "Dev Team", "Description");
         long userId = 1;
 
         Assert.Throws<InvalidOperationException>(() => team.RemoveMember(userId));
@@ -74,7 +74,7 @@ public class TeamBusinessEntityTests
     [Test]
     public void HasMember_WithExistingMember_ReturnsTrue()
     {
-        var team = new TeamBusinessEntity(new TeamId(1), "Dev Team", "Description");
+        var team = new TeamBusinessEntity(1, "Dev Team", "Description");
         long userId = 1;
         team.AddMember(userId);
 

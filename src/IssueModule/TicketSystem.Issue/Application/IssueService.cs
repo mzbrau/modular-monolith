@@ -20,17 +20,16 @@ internal class IssueService
         _teamModuleApi = teamModuleApi;
     }
 
-    public async Task<IssueId> CreateIssueAsync(string title, string? description, IssuePriority priority, DateTime? dueDate)
+    public async Task<long> CreateIssueAsync(string title, string? description, IssuePriority priority, DateTime? dueDate)
     {
-        var issueId = await _issueRepository.GetNextIdAsync();
-        var issue = new IssueBusinessEntity(issueId, title, description, priority, dueDate);
+        var issue = new IssueBusinessEntity(0, title, description, priority, dueDate);
 
         await _issueRepository.AddAsync(issue);
 
-        return issueId;
+        return issue.Id;
     }
 
-    public async Task<IssueBusinessEntity> GetIssueAsync(IssueId issueId)
+    public async Task<IssueBusinessEntity> GetIssueAsync(long issueId)
     {
         var issue = await _issueRepository.GetByIdAsync(issueId);
         if (issue == null)
@@ -44,7 +43,7 @@ internal class IssueService
         return await _issueRepository.GetAllAsync();
     }
 
-    public async Task UpdateIssueAsync(IssueId issueId, string title, string? description, IssuePriority priority, DateTime? dueDate)
+    public async Task UpdateIssueAsync(long issueId, string title, string? description, IssuePriority priority, DateTime? dueDate)
     {
         var issue = await _issueRepository.GetByIdAsync(issueId);
         if (issue == null)
@@ -54,7 +53,7 @@ internal class IssueService
         await _issueRepository.UpdateAsync(issue);
     }
 
-    public async Task AssignIssueToUserAsync(IssueId issueId, long? userId)
+    public async Task AssignIssueToUserAsync(long issueId, long? userId)
     {
         var issue = await _issueRepository.GetByIdAsync(issueId);
         if (issue == null)
@@ -62,7 +61,7 @@ internal class IssueService
 
         if (userId.HasValue)
         {
-            var userExists = await _userModuleApi.UserExistsAsync(userId.Value);
+            var userExists = await _userModuleApi.UserExistsAsync(new UserExistsRequest { UserId = userId.Value });
             if (!userExists)
                 throw new InvalidOperationException($"User with ID '{userId}' does not exist.");
         }
@@ -71,7 +70,7 @@ internal class IssueService
         await _issueRepository.UpdateAsync(issue);
     }
 
-    public async Task AssignIssueToTeamAsync(IssueId issueId, long? teamId)
+    public async Task AssignIssueToTeamAsync(long issueId, long? teamId)
     {
         var issue = await _issueRepository.GetByIdAsync(issueId);
         if (issue == null)
@@ -79,7 +78,7 @@ internal class IssueService
 
         if (teamId.HasValue)
         {
-            var teamExists = await _teamModuleApi.TeamExistsAsync(teamId.Value);
+            var teamExists = await _teamModuleApi.TeamExistsAsync(new TeamExistsRequest { TeamId = teamId.Value });
             if (!teamExists)
                 throw new InvalidOperationException($"Team with ID '{teamId}' does not exist.");
         }
@@ -88,7 +87,7 @@ internal class IssueService
         await _issueRepository.UpdateAsync(issue);
     }
 
-    public async Task UpdateIssueStatusAsync(IssueId issueId, IssueStatus status)
+    public async Task UpdateIssueStatusAsync(long issueId, IssueStatus status)
     {
         var issue = await _issueRepository.GetByIdAsync(issueId);
         if (issue == null)
@@ -108,7 +107,7 @@ internal class IssueService
         return await _issueRepository.GetByTeamIdAsync(teamId);
     }
 
-    public async Task DeleteIssueAsync(IssueId issueId)
+    public async Task DeleteIssueAsync(long issueId)
     {
         var issue = await _issueRepository.GetByIdAsync(issueId);
         if (issue == null)
@@ -117,7 +116,7 @@ internal class IssueService
         await _issueRepository.DeleteAsync(issue);
     }
 
-    public async Task<bool> IssueExistsAsync(IssueId issueId)
+    public async Task<bool> IssueExistsAsync(long issueId)
     {
         return await _issueRepository.ExistsAsync(issueId);
     }

@@ -6,7 +6,7 @@ namespace TicketSystem.Architecture.Tests;
 [TestFixture]
 public class TeamModuleLayerTests
 {
-    private static readonly Assembly TeamModuleAssembly = typeof(Team.Domain.TeamId).Assembly;
+    private static readonly Assembly TeamModuleAssembly = typeof(Team.Domain.TeamBusinessEntity).Assembly;
 
     [Test]
     public void Domain_ShouldNotDependOn_Application()
@@ -18,8 +18,14 @@ public class TeamModuleLayerTests
             .HaveDependencyOn("TicketSystem.Team.Application")
             .GetResult();
 
-        Assert.That(result.IsSuccessful, Is.True,
-            "Domain layer should not depend on Application layer");
+        var errorMessage = "Domain layer should not depend on Application layer";
+        if (!result.IsSuccessful && result.FailingTypes != null)
+        {
+            var failingTypes = string.Join("\n  - ", result.FailingTypes.Select(t => t.FullName));
+            errorMessage += $"\n\nFailing types:\n  - {failingTypes}";
+        }
+
+        Assert.That(result.IsSuccessful, Is.True, errorMessage);
     }
 
     [Test]
@@ -32,8 +38,14 @@ public class TeamModuleLayerTests
             .HaveDependencyOn("TicketSystem.Team.Infrastructure")
             .GetResult();
 
-        Assert.That(result.IsSuccessful, Is.True,
-            "Domain layer should not depend on Infrastructure layer");
+        var errorMessage = "Domain layer should not depend on Infrastructure layer";
+        if (!result.IsSuccessful && result.FailingTypes != null)
+        {
+            var failingTypes = string.Join("\n  - ", result.FailingTypes.Select(t => t.FullName));
+            errorMessage += $"\n\nFailing types:\n  - {failingTypes}";
+        }
+
+        Assert.That(result.IsSuccessful, Is.True, errorMessage);
     }
 
     [Test]
@@ -46,7 +58,13 @@ public class TeamModuleLayerTests
             .HaveDependencyOn("TicketSystem.Team.Infrastructure")
             .GetResult();
 
-        Assert.That(result.IsSuccessful, Is.True,
-            "Application layer should not depend on Infrastructure layer");
+        var errorMessage = "Application layer should not depend on Infrastructure layer";
+        if (!result.IsSuccessful && result.FailingTypes != null)
+        {
+            var failingTypes = string.Join("\n  - ", result.FailingTypes.Select(t => t.FullName));
+            errorMessage += $"\n\nFailing types:\n  - {failingTypes}";
+        }
+
+        Assert.That(result.IsSuccessful, Is.True, errorMessage);
     }
 }

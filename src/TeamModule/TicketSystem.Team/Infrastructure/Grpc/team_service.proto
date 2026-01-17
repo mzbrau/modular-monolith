@@ -1,0 +1,88 @@
+syntax = "proto3";
+
+option csharp_namespace = "TicketSystem.Team.Infrastructure.Grpc";
+
+package team;
+
+service TeamService {
+  rpc CreateTeam (CreateTeamRequest) returns (CreateTeamResponse);
+  rpc GetTeam (GetTeamRequest) returns (GetTeamResponse);
+  rpc ListTeams (ListTeamsRequest) returns (ListTeamsResponse);
+  rpc UpdateTeam (UpdateTeamRequest) returns (UpdateTeamResponse);
+  rpc AddMemberToTeam (AddMemberToTeamRequest) returns (AddMemberToTeamResponse);
+  rpc RemoveMemberFromTeam (RemoveMemberFromTeamRequest) returns (RemoveMemberFromTeamResponse);
+  rpc GetTeamMembers (GetTeamMembersRequest) returns (GetTeamMembersResponse);
+}
+
+message CreateTeamRequest {
+  string name = 1;
+  string description = 2;
+}
+
+message CreateTeamResponse {
+  string team_id = 1;
+}
+
+message GetTeamRequest {
+  string team_id = 1;
+}
+
+message GetTeamResponse {
+  TeamMessage team = 1;
+}
+
+message ListTeamsRequest {
+}
+
+message ListTeamsResponse {
+  repeated TeamMessage teams = 1;
+}
+
+message UpdateTeamRequest {
+  string team_id = 1;
+  string name = 2;
+  string description = 3;
+}
+
+message UpdateTeamResponse {
+}
+
+message AddMemberToTeamRequest {
+  string team_id = 1;
+  string user_id = 2;
+  int32 role = 3;
+}
+
+message AddMemberToTeamResponse {
+}
+
+message RemoveMemberFromTeamRequest {
+  string team_id = 1;
+  string user_id = 2;
+}
+
+message RemoveMemberFromTeamResponse {
+}
+
+message GetTeamMembersRequest {
+  string team_id = 1;
+}
+
+message GetTeamMembersResponse {
+  repeated TeamMemberMessage members = 1;
+}
+
+message TeamMessage {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  string created_date = 4;
+  repeated TeamMemberMessage members = 5;
+}
+
+message TeamMemberMessage {
+  string id = 1;
+  string user_id = 2;
+  string joined_date = 3;
+  int32 role = 4;
+}

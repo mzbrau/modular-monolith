@@ -1,12 +1,13 @@
 using System.Reflection;
 using NetArchTest.Rules;
+using TicketSystem.Architecture.Tests.ExtensionMethods;
 
 namespace TicketSystem.Architecture.Tests;
 
 [TestFixture]
 public class IssueModuleLayerTests
 {
-    private static readonly Assembly IssueModuleAssembly = typeof(Issue.Domain.IssueId).Assembly;
+    private static readonly Assembly IssueModuleAssembly = typeof(Issue.Domain.IssueBusinessEntity).Assembly;
 
     [Test]
     public void Domain_ShouldNotDependOn_Application()
@@ -18,8 +19,8 @@ public class IssueModuleLayerTests
             .HaveDependencyOn("TicketSystem.Issue.Application")
             .GetResult();
 
-        Assert.That(result.IsSuccessful, Is.True,
-            "Domain layer should not depend on Application layer");
+        var errorMessage = "Domain layer should not depend on Application layer";
+        Assert.That(result.IsSuccessful, Is.True, result.GetDetails(errorMessage));
     }
 
     [Test]
@@ -32,21 +33,21 @@ public class IssueModuleLayerTests
             .HaveDependencyOn("TicketSystem.Issue.Infrastructure")
             .GetResult();
 
-        Assert.That(result.IsSuccessful, Is.True,
-            "Domain layer should not depend on Infrastructure layer");
+        var errorMessage = "Domain layer should not depend on Infrastructure layer";
+        Assert.That(result.IsSuccessful, Is.True, result.GetDetails(errorMessage));
     }
 
     [Test]
     public void Application_ShouldNotDependOn_Infrastructure()
     {
-        var result = Types.InAssembly(IssueModuleAssembly)
+        TestResult? result = Types.InAssembly(IssueModuleAssembly)
             .That()
             .ResideInNamespace("TicketSystem.Issue.Application")
             .ShouldNot()
             .HaveDependencyOn("TicketSystem.Issue.Infrastructure")
             .GetResult();
 
-        Assert.That(result.IsSuccessful, Is.True,
-            "Application layer should not depend on Infrastructure layer");
+        var errorMessage = "Application layer should not depend on Infrastructure layer";
+        Assert.That(result.IsSuccessful, Is.True, result.GetDetails(errorMessage));
     }
 }

@@ -2,12 +2,12 @@ namespace TicketSystem.User.Contracts;
 
 public interface IUserModuleApi
 {
-    Task<long> CreateUserAsync(string email, string firstName, string lastName);
-    Task<UserDataContract?> GetUserAsync(long userId);
+    Task<CreateUserResponse> CreateUserAsync(CreateUserRequest request);
+    Task<UserDataContract?> GetUserAsync(GetUserRequest request);
     Task<List<UserDataContract>> GetAllUsersAsync();
-    Task<List<UserDataContract>> GetUsersAsync(List<long> userIds);
-    Task UpdateUserAsync(long userId, string firstName, string lastName);
-    Task DeactivateUserAsync(long userId);
-    Task<UserDataContract?> FindUserByEmailAsync(string email);
-    Task<bool> UserExistsAsync(long userId);
+    Task<List<UserDataContract>> GetUsersAsync(GetUsersByIdsRequest request);
+    Task UpdateUserAsync(UpdateUserRequest request);
+    Task DeactivateUserAsync(DeactivateUserRequest request);
+    Task<UserDataContract?> FindUserByEmailAsync(FindUserByEmailRequest request);
+    Task<bool> UserExistsAsync(UserExistsRequest request);
 }
