@@ -1,4 +1,5 @@
 using Grpc.Net.Client;
+using Microsoft.Extensions.Logging;
 using TicketSystem.Issue.Infrastructure.Grpc;
 
 namespace TicketSystem.Client.Services;
@@ -7,23 +8,36 @@ public class IssueGrpcClient : IDisposable
 {
     private readonly GrpcChannel _channel;
     private readonly IssueService.IssueServiceClient _client;
+    private readonly ILogger<IssueGrpcClient> _logger;
 
-    public IssueGrpcClient(string grpcAddress)
+    public IssueGrpcClient(string grpcAddress, ILogger<IssueGrpcClient> logger)
     {
         _channel = GrpcChannel.ForAddress(grpcAddress);
         _client = new IssueService.IssueServiceClient(_channel);
+        _logger = logger;
+        _logger.LogInformation("IssueGrpcClient initialized with address: {GrpcAddress}", grpcAddress);
     }
 
     public async Task<string> CreateIssueAsync(string title, string description, int priority, DateTime? dueDate)
     {
-        var response = await _client.CreateIssueAsync(new CreateIssueRequest
+        _logger.LogInformation("Creating issue via gRPC: {Title}, Priority: {Priority}", title, priority);
+        try
         {
-            Title = title,
-            Description = description,
-            Priority = priority,
-            DueDate = dueDate?.ToString("O") ?? string.Empty
-        });
-        return response.IssueId;
+            var response = await _client.CreateIssueAsync(new CreateIssueRequest
+            {
+                Title = title,
+                Description = description,
+                Priority = priority,
+                DueDate = dueDate?.ToString("O") ?? string.Empty
+            });
+            _logger.LogInformation("Issue created successfully via gRPC: {IssueId}", response.IssueId);
+            return response.IssueId;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to create issue via gRPC: {Title}", title);
+            throw;
+        }
     }
 
     public async Task<IssueMessage?> GetIssueAsync(string issueId)
@@ -59,11 +73,21 @@ public class IssueGrpcClient : IDisposable
 
     public async Task AssignIssueToUserAsync(string issueId, string? userId)
     {
-        await _client.AssignIssueToUserAsync(new AssignIssueToUserRequest
+        _logger.LogInformation("Assigning issue {IssueId} to user {UserId} via gRPC", issueId, userId ?? "(unassigned)");
+        try
         {
-            IssueId = issueId,
-            UserId = userId ?? string.Empty
-        });
+            await _client.AssignIssueToUserAsync(new AssignIssueToUserRequest
+            {
+                IssueId = issueId,
+                UserId = userId ?? string.Empty
+            });
+            _logger.LogInformation("Issue {IssueId} assigned to user successfully", issueId);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to assign issue {IssueId} to user via gRPC", issueId);
+            throw;
+        }
     }
 
     public async Task AssignIssueToTeamAsync(string issueId, string? teamId)

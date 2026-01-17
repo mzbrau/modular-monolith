@@ -11,13 +11,31 @@ builder.Services.AddRazorComponents()
 
 // Configure gRPC clients
 var grpcAddress = builder.Configuration.GetValue<string>("GrpcAddress") ?? "https://localhost:5001";
-builder.Services.AddSingleton(new UserGrpcClient(grpcAddress));
-builder.Services.AddSingleton(new TeamGrpcClient(grpcAddress));
-builder.Services.AddSingleton(new IssueGrpcClient(grpcAddress));
+
+builder.Services.AddSingleton<UserGrpcClient>(sp => 
+{
+    var logger = sp.GetRequiredService<ILogger<UserGrpcClient>>();
+    return new UserGrpcClient(grpcAddress, logger);
+});
+
+builder.Services.AddSingleton<TeamGrpcClient>(sp => 
+{
+    var logger = sp.GetRequiredService<ILogger<TeamGrpcClient>>();
+    return new TeamGrpcClient(grpcAddress, logger);
+});
+
+builder.Services.AddSingleton<IssueGrpcClient>(sp => 
+{
+    var logger = sp.GetRequiredService<ILogger<IssueGrpcClient>>();
+    return new IssueGrpcClient(grpcAddress, logger);
+});
 
 var app = builder.Build();
 
 app.MapDefaultEndpoints();
+
+var logger = app.Services.GetRequiredService<ILogger<Program>>();
+logger.LogInformation("TicketSystem Client starting with gRPC address: {GrpcAddress}", grpcAddress);
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

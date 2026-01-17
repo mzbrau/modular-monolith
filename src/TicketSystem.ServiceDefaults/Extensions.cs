@@ -6,6 +6,8 @@ using Microsoft.Extensions.Logging;
 using OpenTelemetry;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
+using Serilog;
+using Serilog.Events;
 
 namespace Microsoft.Extensions.Hosting;
 
@@ -16,6 +18,8 @@ public static class Extensions
 {
     public static TBuilder AddServiceDefaults<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
     {
+        builder.ConfigureSerilog();
+        
         builder.ConfigureOpenTelemetry();
 
         builder.AddDefaultHealthChecks();
@@ -36,6 +40,26 @@ public static class Extensions
         // {
         //     options.AllowedSchemes = ["https"];
         // });
+
+        return builder;
+    }
+
+    public static TBuilder ConfigureSerilog<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
+    {
+        var appName = builder.Environment.ApplicationName;
+        var logsPath = Path.Combine(AppContext.BaseDirectory, "logs");
+        
+        // Ensure logs directory exists
+        Directory.CreateDirectory(logsPath);
+
+        // Configure Serilog
+        Log.Logger = new LoggerConfiguration()
+            .ReadFrom.Configuration(builder.Configuration)
+            .Enrich.FromLogContext()
+            .Enrich.WithProperty("ApplicationName", appName)
+            .CreateLogger();
+
+        builder.Services.AddSerilog();
 
         return builder;
     }

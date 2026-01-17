@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using NSubstitute;
 using TicketSystem.Issue.Application;
 using TicketSystem.Issue.Domain;
@@ -12,6 +13,7 @@ public class IssueServiceTests
     private IIssueRepository _issueRepository = null!;
     private IUserModuleApi _userModuleApi = null!;
     private ITeamModuleApi _teamModuleApi = null!;
+    private ILogger<IssueService> _logger = null!;
     private IssueService _issueService = null!;
 
     [SetUp]
@@ -20,7 +22,8 @@ public class IssueServiceTests
         _issueRepository = Substitute.For<IIssueRepository>();
         _userModuleApi = Substitute.For<IUserModuleApi>();
         _teamModuleApi = Substitute.For<ITeamModuleApi>();
-        _issueService = new IssueService(_issueRepository, _userModuleApi, _teamModuleApi);
+        _logger = Substitute.For<ILogger<IssueService>>();
+        _issueService = new IssueService(_issueRepository, _userModuleApi, _teamModuleApi, _logger);
     }
 
     [Test]

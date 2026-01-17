@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using NSubstitute;
 using TicketSystem.User.Application;
 using TicketSystem.User.Domain;
@@ -8,13 +9,15 @@ namespace TicketSystem.User.Tests;
 public class UserServiceTests
 {
     private IUserRepository _userRepository = null!;
+    private ILogger<UserService> _logger = null!;
     private UserService _userService = null!;
 
     [SetUp]
     public void Setup()
     {
         _userRepository = Substitute.For<IUserRepository>();
-        _userService = new UserService(_userRepository);
+        _logger = Substitute.For<ILogger<UserService>>();
+        _userService = new UserService(_userRepository, _logger);
     }
 
     [Test]

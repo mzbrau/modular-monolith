@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using NSubstitute;
 using TicketSystem.Team.Application;
 using TicketSystem.Team.Domain;
@@ -10,6 +11,7 @@ public class TeamServiceTests
 {
     private ITeamRepository _teamRepository = null!;
     private IUserModuleApi _userModuleApi = null!;
+    private ILogger<TeamService> _logger = null!;
     private TeamService _teamService = null!;
 
     [SetUp]
@@ -17,7 +19,8 @@ public class TeamServiceTests
     {
         _teamRepository = Substitute.For<ITeamRepository>();
         _userModuleApi = Substitute.For<IUserModuleApi>();
-        _teamService = new TeamService(_teamRepository, _userModuleApi);
+        _logger = Substitute.For<ILogger<TeamService>>();
+        _teamService = new TeamService(_teamRepository, _userModuleApi, _logger);
     }
 
     [Test]

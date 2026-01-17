@@ -1,4 +1,5 @@
 using Grpc.Net.Client;
+using Microsoft.Extensions.Logging;
 using TicketSystem.Team.Infrastructure.Grpc;
 
 namespace TicketSystem.Client.Services;
@@ -7,21 +8,34 @@ public class TeamGrpcClient : IDisposable
 {
     private readonly GrpcChannel _channel;
     private readonly TeamService.TeamServiceClient _client;
+    private readonly ILogger<TeamGrpcClient> _logger;
 
-    public TeamGrpcClient(string grpcAddress)
+    public TeamGrpcClient(string grpcAddress, ILogger<TeamGrpcClient> logger)
     {
         _channel = GrpcChannel.ForAddress(grpcAddress);
         _client = new TeamService.TeamServiceClient(_channel);
+        _logger = logger;
+        _logger.LogInformation("TeamGrpcClient initialized with address: {GrpcAddress}", grpcAddress);
     }
 
     public async Task<string> CreateTeamAsync(string name, string description)
     {
-        var response = await _client.CreateTeamAsync(new CreateTeamRequest
+        _logger.LogInformation("Creating team via gRPC: {TeamName}", name);
+        try
         {
-            Name = name,
-            Description = description
-        });
-        return response.TeamId;
+            var response = await _client.CreateTeamAsync(new CreateTeamRequest
+            {
+                Name = name,
+                Description = description
+            });
+            _logger.LogInformation("Team created successfully via gRPC: {TeamId}", response.TeamId);
+            return response.TeamId;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to create team via gRPC: {TeamName}", name);
+            throw;
+        }
     }
 
     public async Task<TeamMessage?> GetTeamAsync(string teamId)
@@ -55,12 +69,22 @@ public class TeamGrpcClient : IDisposable
 
     public async Task AddMemberToTeamAsync(string teamId, string userId, int role)
     {
-        await _client.AddMemberToTeamAsync(new AddMemberToTeamRequest
+        _logger.LogInformation("Adding user {UserId} to team {TeamId} via gRPC", userId, teamId);
+        try
         {
-            TeamId = teamId,
-            UserId = userId,
-            Role = role
-        });
+            await _client.AddMemberToTeamAsync(new AddMemberToTeamRequest
+            {
+                TeamId = teamId,
+                UserId = userId,
+                Role = role
+            });
+            _logger.LogInformation("User {UserId} added to team {TeamId} successfully", userId, teamId);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to add user {UserId} to team {TeamId} via gRPC", userId, teamId);
+            throw;
+        }
     }
 
     public async Task RemoveMemberFromTeamAsync(string teamId, string userId)
