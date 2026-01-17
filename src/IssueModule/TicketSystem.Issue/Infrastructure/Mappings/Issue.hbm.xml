@@ -12,8 +12,8 @@
     <property name="Description" column="Description" />
     <property name="Status" column="Status" not-null="true" />
     <property name="Priority" column="Priority" not-null="true" />
-    <property name="AssignedUserId" column="AssignedUserId" type="TicketSystem.Issue.Infrastructure.Mappings.NullableLongType, TicketSystem.Issue" />
-    <property name="AssignedTeamId" column="AssignedTeamId" type="TicketSystem.Issue.Infrastructure.Mappings.NullableLongType, TicketSystem.Issue" />
+    <property name="AssignedUserId" column="AssignedUserId" type="Int64" />
+    <property name="AssignedTeamId" column="AssignedTeamId" type="Int64" />
     <property name="CreatedDate" column="CreatedDate" not-null="true" />
     <property name="DueDate" column="DueDate" />
     <property name="ResolvedDate" column="ResolvedDate" />

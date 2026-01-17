@@ -44,7 +44,7 @@ internal class IssueGrpcService : IssueService.IssueServiceBase
     {
         var issues = await _issueService.GetAllIssuesAsync();
         var response = new ListIssuesResponse();
-        response.Issues.AddRange(issues.Select(MapToMessage));
+        response.Issues.AddRange(issues.Where(i => i != null).Select(MapToMessage));
         return response;
     }
 
@@ -144,7 +144,7 @@ internal class IssueGrpcService : IssueService.IssueServiceBase
         var userId = long.Parse(request.UserId);
         var issues = await _issueService.GetIssuesByUserAsync(userId);
         var response = new GetIssuesByUserResponse();
-        response.Issues.AddRange(issues.Select(MapToMessage));
+        response.Issues.AddRange(issues.Where(i => i != null).Select(MapToMessage));
         return response;
     }
 
@@ -153,7 +153,7 @@ internal class IssueGrpcService : IssueService.IssueServiceBase
         var teamId = long.Parse(request.TeamId);
         var issues = await _issueService.GetIssuesByTeamAsync(teamId);
         var response = new GetIssuesByTeamResponse();
-        response.Issues.AddRange(issues.Select(MapToMessage));
+        response.Issues.AddRange(issues.Where(i => i != null).Select(MapToMessage));
         return response;
     }
 
@@ -180,7 +180,7 @@ internal class IssueGrpcService : IssueService.IssueServiceBase
         return new IssueMessage
         {
             Id = issue.Id.ToString(),
-            Title = issue.Title,
+            Title = issue.Title ?? string.Empty,
             Description = issue.Description ?? string.Empty,
             Status = (int)issue.Status,
             Priority = (int)issue.Priority,

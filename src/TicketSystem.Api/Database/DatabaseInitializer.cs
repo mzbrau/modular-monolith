@@ -39,7 +39,7 @@ public class DatabaseInitializer
         var createTableStatements = new[]
         {
             @"CREATE TABLE IF NOT EXISTS Users (
-                Id TEXT PRIMARY KEY,
+                Id INTEGER PRIMARY KEY AUTOINCREMENT,
                 Email TEXT NOT NULL UNIQUE,
                 FirstName TEXT NOT NULL,
                 LastName TEXT NOT NULL,
@@ -47,27 +47,27 @@ public class DatabaseInitializer
                 IsActive INTEGER NOT NULL DEFAULT 1
             )",
             @"CREATE TABLE IF NOT EXISTS Teams (
-                Id TEXT PRIMARY KEY,
+                Id INTEGER PRIMARY KEY AUTOINCREMENT,
                 Name TEXT NOT NULL,
                 Description TEXT,
                 CreatedDate TEXT NOT NULL
             )",
             @"CREATE TABLE IF NOT EXISTS TeamMembers (
-                Id TEXT PRIMARY KEY,
-                TeamId TEXT NOT NULL,
-                UserId TEXT NOT NULL,
+                Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                TeamId INTEGER NOT NULL,
+                UserId INTEGER NOT NULL,
                 JoinedDate TEXT NOT NULL,
                 Role INTEGER NOT NULL,
                 FOREIGN KEY (TeamId) REFERENCES Teams(Id)
             )",
             @"CREATE TABLE IF NOT EXISTS Issues (
-                Id TEXT PRIMARY KEY,
+                Id INTEGER PRIMARY KEY AUTOINCREMENT,
                 Title TEXT NOT NULL,
                 Description TEXT,
                 Status INTEGER NOT NULL,
                 Priority INTEGER NOT NULL,
-                AssignedUserId TEXT,
-                AssignedTeamId TEXT,
+                AssignedUserId INTEGER,
+                AssignedTeamId INTEGER,
                 CreatedDate TEXT NOT NULL,
                 DueDate TEXT,
                 ResolvedDate TEXT,

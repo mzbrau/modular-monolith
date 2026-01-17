@@ -38,7 +38,7 @@ internal class TeamGrpcService : TeamService.TeamServiceBase
     {
         var teams = await _teamService.GetAllTeamsAsync();
         var response = new ListTeamsResponse();
-        response.Teams.AddRange(teams.Select(MapToMessage));
+        response.Teams.AddRange(teams.Where(t => t != null).Select(MapToMessage));
         return response;
     }
 
@@ -113,7 +113,7 @@ internal class TeamGrpcService : TeamService.TeamServiceBase
             var teamId = long.Parse(request.TeamId);
             var members = await _teamService.GetTeamMembersAsync(teamId);
             var response = new GetTeamMembersResponse();
-            response.Members.AddRange(members.Select(MapMemberToMessage));
+            response.Members.AddRange(members.Where(m => m != null).Select(MapMemberToMessage));
             return response;
         }
         catch (KeyNotFoundException)
@@ -131,11 +131,11 @@ internal class TeamGrpcService : TeamService.TeamServiceBase
         var message = new TeamMessage
         {
             Id = team.Id.ToString(),
-            Name = team.Name,
+            Name = team.Name ?? string.Empty,
             Description = team.Description ?? string.Empty,
             CreatedDate = team.CreatedDate.ToString("O")
         };
-        message.Members.AddRange(team.Members.Select(MapMemberToMessage));
+        message.Members.AddRange(team.Members?.Where(m => m != null).Select(MapMemberToMessage) ?? Enumerable.Empty<TeamMemberMessage>());
         return message;
     }
 
