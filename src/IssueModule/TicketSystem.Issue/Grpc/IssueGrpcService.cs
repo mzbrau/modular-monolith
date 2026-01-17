@@ -1,16 +1,15 @@
 using Grpc.Core;
-using TicketSystem.Api.Protos;
-using TicketSystem.Issue.Contracts;
+using TicketSystem.Issue.Domain;
 
-namespace TicketSystem.Api.Services;
+namespace TicketSystem.Issue.Grpc;
 
-public class IssueGrpcService : IssueService.IssueServiceBase
+internal class IssueGrpcService : IssueService.IssueServiceBase
 {
-    private readonly IIssueModuleApi _issueModuleApi;
+    private readonly Application.IssueService _issueService;
 
-    public IssueGrpcService(IIssueModuleApi issueModuleApi)
+    public IssueGrpcService(Application.IssueService issueService)
     {
-        _issueModuleApi = issueModuleApi;
+        _issueService = issueService;
     }
 
     public override async Task<CreateIssueResponse> CreateIssue(CreateIssueRequest request, ServerCallContext context)
@@ -21,8 +20,8 @@ public class IssueGrpcService : IssueService.IssueServiceBase
             dueDate = DateTime.Parse(request.DueDate).ToUniversalTime();
         }
 
-        var issueId = await _issueModuleApi.CreateIssueAsync(request.Title, request.Description, request.Priority, dueDate);
-        return new CreateIssueResponse { IssueId = issueId.ToString() };
+        var issueId = await _issueService.CreateIssueAsync(request.Title, request.Description, (IssuePriority)request.Priority, dueDate);
+        return new CreateIssueResponse { IssueId = issueId.Value.ToString() };
     }
 
     public override async Task<GetIssueResponse> GetIssue(GetIssueRequest request, ServerCallContext context)
@@ -30,16 +29,20 @@ public class IssueGrpcService : IssueService.IssueServiceBase
         if (!long.TryParse(request.IssueId, out var issueId))
             throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid issue_id"));
 
-        var issue = await _issueModuleApi.GetIssueAsync(issueId);
-        if (issue == null)
+        try
+        {
+            var issue = await _issueService.GetIssueAsync(new IssueId(issueId));
+            return new GetIssueResponse { Issue = MapToMessage(issue) };
+        }
+        catch (KeyNotFoundException)
+        {
             throw new RpcException(new Status(StatusCode.NotFound, $"Issue with ID {request.IssueId} not found"));
-
-        return new GetIssueResponse { Issue = MapToMessage(issue) };
+        }
     }
 
     public override async Task<ListIssuesResponse> ListIssues(ListIssuesRequest request, ServerCallContext context)
     {
-        var issues = await _issueModuleApi.GetAllIssuesAsync();
+        var issues = await _issueService.GetAllIssuesAsync();
         var response = new ListIssuesResponse();
         response.Issues.AddRange(issues.Select(MapToMessage));
         return response;
@@ -56,7 +59,7 @@ public class IssueGrpcService : IssueService.IssueServiceBase
                 dueDate = DateTime.Parse(request.DueDate).ToUniversalTime();
             }
 
-            await _issueModuleApi.UpdateIssueAsync(issueId, request.Title, request.Description, request.Priority, dueDate);
+            await _issueService.UpdateIssueAsync(new IssueId(issueId), request.Title, request.Description, (IssuePriority)request.Priority, dueDate);
 
             return new UpdateIssueResponse();
         }
@@ -77,7 +80,7 @@ public class IssueGrpcService : IssueService.IssueServiceBase
             var issueId = long.Parse(request.IssueId);
             long? userId = string.IsNullOrEmpty(request.UserId) ? null : long.Parse(request.UserId);
 
-            await _issueModuleApi.AssignIssueToUserAsync(issueId, userId);
+            await _issueService.AssignIssueToUserAsync(new IssueId(issueId), userId);
             return new AssignIssueToUserResponse();
         }
         catch (KeyNotFoundException ex)
@@ -101,7 +104,7 @@ public class IssueGrpcService : IssueService.IssueServiceBase
             var issueId = long.Parse(request.IssueId);
             long? teamId = string.IsNullOrEmpty(request.TeamId) ? null : long.Parse(request.TeamId);
 
-            await _issueModuleApi.AssignIssueToTeamAsync(issueId, teamId);
+            await _issueService.AssignIssueToTeamAsync(new IssueId(issueId), teamId);
             return new AssignIssueToTeamResponse();
         }
         catch (KeyNotFoundException ex)
@@ -123,7 +126,7 @@ public class IssueGrpcService : IssueService.IssueServiceBase
         try
         {
             var issueId = long.Parse(request.IssueId);
-            await _issueModuleApi.UpdateIssueStatusAsync(issueId, request.Status);
+            await _issueService.UpdateIssueStatusAsync(new IssueId(issueId), (IssueStatus)request.Status);
             return new UpdateIssueStatusResponse();
         }
         catch (KeyNotFoundException)
@@ -139,7 +142,7 @@ public class IssueGrpcService : IssueService.IssueServiceBase
     public override async Task<GetIssuesByUserResponse> GetIssuesByUser(GetIssuesByUserRequest request, ServerCallContext context)
     {
         var userId = long.Parse(request.UserId);
-        var issues = await _issueModuleApi.GetIssuesByUserAsync(userId);
+        var issues = await _issueService.GetIssuesByUserAsync(userId);
         var response = new GetIssuesByUserResponse();
         response.Issues.AddRange(issues.Select(MapToMessage));
         return response;
@@ -148,7 +151,7 @@ public class IssueGrpcService : IssueService.IssueServiceBase
     public override async Task<GetIssuesByTeamResponse> GetIssuesByTeam(GetIssuesByTeamRequest request, ServerCallContext context)
     {
         var teamId = long.Parse(request.TeamId);
-        var issues = await _issueModuleApi.GetIssuesByTeamAsync(teamId);
+        var issues = await _issueService.GetIssuesByTeamAsync(teamId);
         var response = new GetIssuesByTeamResponse();
         response.Issues.AddRange(issues.Select(MapToMessage));
         return response;
@@ -159,7 +162,7 @@ public class IssueGrpcService : IssueService.IssueServiceBase
         try
         {
             var issueId = long.Parse(request.IssueId);
-            await _issueModuleApi.DeleteIssueAsync(issueId);
+            await _issueService.DeleteIssueAsync(new IssueId(issueId));
             return new DeleteIssueResponse();
         }
         catch (KeyNotFoundException)
@@ -172,15 +175,15 @@ public class IssueGrpcService : IssueService.IssueServiceBase
         }
     }
 
-    private static IssueMessage MapToMessage(IssueDataContract issue)
+    private static IssueMessage MapToMessage(IssueBusinessEntity issue)
     {
         return new IssueMessage
         {
-            Id = issue.Id.ToString(),
+            Id = issue.Id.Value.ToString(),
             Title = issue.Title,
             Description = issue.Description ?? string.Empty,
-            Status = issue.Status,
-            Priority = issue.Priority,
+            Status = (int)issue.Status,
+            Priority = (int)issue.Priority,
             AssignedUserId = issue.AssignedUserId?.ToString() ?? string.Empty,
             AssignedTeamId = issue.AssignedTeamId?.ToString() ?? string.Empty,
             CreatedDate = issue.CreatedDate.ToString("O"),

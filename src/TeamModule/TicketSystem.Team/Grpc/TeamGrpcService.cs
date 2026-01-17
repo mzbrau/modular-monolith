@@ -1,22 +1,21 @@
 using Grpc.Core;
-using TicketSystem.Api.Protos;
-using TicketSystem.Team.Contracts;
+using TicketSystem.Team.Domain;
 
-namespace TicketSystem.Api.Services;
+namespace TicketSystem.Team.Grpc;
 
-public class TeamGrpcService : TeamService.TeamServiceBase
+internal class TeamGrpcService : TeamService.TeamServiceBase
 {
-    private readonly ITeamModuleApi _teamModuleApi;
+    private readonly Application.TeamService _teamService;
 
-    public TeamGrpcService(ITeamModuleApi teamModuleApi)
+    public TeamGrpcService(Application.TeamService teamService)
     {
-        _teamModuleApi = teamModuleApi;
+        _teamService = teamService;
     }
 
     public override async Task<CreateTeamResponse> CreateTeam(CreateTeamRequest request, ServerCallContext context)
     {
-        var teamId = await _teamModuleApi.CreateTeamAsync(request.Name, request.Description);
-        return new CreateTeamResponse { TeamId = teamId.ToString() };
+        var teamId = await _teamService.CreateTeamAsync(request.Name, request.Description);
+        return new CreateTeamResponse { TeamId = teamId.Value.ToString() };
     }
 
     public override async Task<GetTeamResponse> GetTeam(GetTeamRequest request, ServerCallContext context)
@@ -24,16 +23,20 @@ public class TeamGrpcService : TeamService.TeamServiceBase
         if (!long.TryParse(request.TeamId, out var teamId))
             throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid team_id"));
 
-        var team = await _teamModuleApi.GetTeamAsync(teamId);
-        if (team == null)
+        try
+        {
+            var team = await _teamService.GetTeamAsync(new TeamId(teamId));
+            return new GetTeamResponse { Team = MapToMessage(team) };
+        }
+        catch (KeyNotFoundException)
+        {
             throw new RpcException(new Status(StatusCode.NotFound, $"Team with ID {request.TeamId} not found"));
-
-        return new GetTeamResponse { Team = MapToMessage(team) };
+        }
     }
 
     public override async Task<ListTeamsResponse> ListTeams(ListTeamsRequest request, ServerCallContext context)
     {
-        var teams = await _teamModuleApi.GetAllTeamsAsync();
+        var teams = await _teamService.GetAllTeamsAsync();
         var response = new ListTeamsResponse();
         response.Teams.AddRange(teams.Select(MapToMessage));
         return response;
@@ -44,7 +47,7 @@ public class TeamGrpcService : TeamService.TeamServiceBase
         try
         {
             var teamId = long.Parse(request.TeamId);
-            await _teamModuleApi.UpdateTeamAsync(teamId, request.Name, request.Description);
+            await _teamService.UpdateTeamAsync(new TeamId(teamId), request.Name, request.Description);
             return new UpdateTeamResponse();
         }
         catch (KeyNotFoundException)
@@ -63,7 +66,7 @@ public class TeamGrpcService : TeamService.TeamServiceBase
         {
             var teamId = long.Parse(request.TeamId);
             var userId = long.Parse(request.UserId);
-            await _teamModuleApi.AddMemberToTeamAsync(teamId, userId, request.Role);
+            await _teamService.AddMemberToTeamAsync(new TeamId(teamId), userId, (TeamRole)request.Role);
             return new AddMemberToTeamResponse();
         }
         catch (KeyNotFoundException ex)
@@ -86,7 +89,7 @@ public class TeamGrpcService : TeamService.TeamServiceBase
         {
             var teamId = long.Parse(request.TeamId);
             var userId = long.Parse(request.UserId);
-            await _teamModuleApi.RemoveMemberFromTeamAsync(teamId, userId);
+            await _teamService.RemoveMemberFromTeamAsync(new TeamId(teamId), userId);
             return new RemoveMemberFromTeamResponse();
         }
         catch (KeyNotFoundException ex)
@@ -108,7 +111,7 @@ public class TeamGrpcService : TeamService.TeamServiceBase
         try
         {
             var teamId = long.Parse(request.TeamId);
-            var members = await _teamModuleApi.GetTeamMembersAsync(teamId);
+            var members = await _teamService.GetTeamMembersAsync(new TeamId(teamId));
             var response = new GetTeamMembersResponse();
             response.Members.AddRange(members.Select(MapMemberToMessage));
             return response;
@@ -123,11 +126,11 @@ public class TeamGrpcService : TeamService.TeamServiceBase
         }
     }
 
-    private static TeamMessage MapToMessage(TeamDataContract team)
+    private static TeamMessage MapToMessage(TeamBusinessEntity team)
     {
         var message = new TeamMessage
         {
-            Id = team.Id.ToString(),
+            Id = team.Id.Value.ToString(),
             Name = team.Name,
             Description = team.Description ?? string.Empty,
             CreatedDate = team.CreatedDate.ToString("O")
@@ -136,14 +139,14 @@ public class TeamGrpcService : TeamService.TeamServiceBase
         return message;
     }
 
-    private static TeamMemberMessage MapMemberToMessage(TeamMemberDataContract member)
+    private static TeamMemberMessage MapMemberToMessage(TeamMemberBusinessEntity member)
     {
         return new TeamMemberMessage
         {
             Id = member.Id.ToString(),
             UserId = member.UserId.ToString(),
             JoinedDate = member.JoinedDate.ToString("O"),
-            Role = member.Role
+            Role = (int)member.Role
         };
     }
 }

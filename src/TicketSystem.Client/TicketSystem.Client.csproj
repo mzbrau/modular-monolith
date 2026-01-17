@@ -14,9 +14,9 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Protobuf Include="..\TicketSystem.Api\Protos\user_service.proto" GrpcServices="Client" Link="Protos\user_service.proto"/>
-        <Protobuf Include="..\TicketSystem.Api\Protos\team_service.proto" GrpcServices="Client" Link="Protos\team_service.proto"/>
-        <Protobuf Include="..\TicketSystem.Api\Protos\issue_service.proto" GrpcServices="Client" Link="Protos\issue_service.proto"/>
+        <Protobuf Include="..\UserModule\TicketSystem.User\Protos\user_service.proto" GrpcServices="Client" Link="Protos\user_service.proto"/>
+        <Protobuf Include="..\TeamModule\TicketSystem.Team\Protos\team_service.proto" GrpcServices="Client" Link="Protos\team_service.proto"/>
+        <Protobuf Include="..\IssueModule\TicketSystem.Issue\Protos\issue_service.proto" GrpcServices="Client" Link="Protos\issue_service.proto"/>
     </ItemGroup>
 
     <ItemGroup>

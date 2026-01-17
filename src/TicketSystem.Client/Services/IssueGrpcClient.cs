@@ -1,5 +1,5 @@
 using Grpc.Net.Client;
-using TicketSystem.Api.Protos;
+using TicketSystem.Issue.Grpc;
 
 namespace TicketSystem.Client.Services;
 

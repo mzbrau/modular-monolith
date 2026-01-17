@@ -7,13 +7,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Protobuf Include="Protos\user_service.proto" GrpcServices="Server"/>
-        <Protobuf Include="Protos\team_service.proto" GrpcServices="Server"/>
-        <Protobuf Include="Protos\issue_service.proto" GrpcServices="Server"/>
-    </ItemGroup>
-
-    <ItemGroup>
-        <PackageReference Include="Grpc.AspNetCore" Version="2.64.0"/>
         <PackageReference Include="NHibernate" Version="5.5.2"/>
     </ItemGroup>
 

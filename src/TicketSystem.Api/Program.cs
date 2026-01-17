@@ -1,6 +1,5 @@
 using NHibernate;
 using TicketSystem.Api.Database;
-using TicketSystem.Api.Services;
 using TicketSystem.Issue.Registration;
 using TicketSystem.Team.Registration;
 using TicketSystem.User.Registration;
@@ -24,8 +23,10 @@ builder.Services.AddUserModule();
 builder.Services.AddTeamModule();
 builder.Services.AddIssueModule();
 
-// Add gRPC services
-builder.Services.AddGrpc();
+// Add gRPC services from modules
+builder.Services.AddUserModuleGrpcServices();
+builder.Services.AddTeamModuleGrpcServices();
+builder.Services.AddIssueModuleGrpcServices();
 
 var app = builder.Build();
 
@@ -41,10 +42,10 @@ using (var scope = app.Services.CreateScope())
 // Configure middleware for transaction handling
 app.UseNHibernateTransaction();
 
-// Map gRPC services
-app.MapGrpcService<UserGrpcService>();
-app.MapGrpcService<TeamGrpcService>();
-app.MapGrpcService<IssueGrpcService>();
+// Map gRPC services from modules
+app.MapUserModuleGrpcServices();
+app.MapTeamModuleGrpcServices();
+app.MapIssueModuleGrpcServices();
 
 app.MapGet("/",
     () =>

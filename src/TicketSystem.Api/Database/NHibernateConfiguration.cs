@@ -2,7 +2,6 @@ using NHibernate;
 using NHibernate.Cfg;
 using NHibernate.Dialect;
 using NHibernate.Driver;
-using NHibernate.Mapping;
 
 namespace TicketSystem.Api.Database;
 

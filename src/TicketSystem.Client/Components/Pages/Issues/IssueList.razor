@@ -1,5 +1,7 @@
 @page "/issues"
-@using TicketSystem.Api.Protos
+@using TicketSystem.Issue.Grpc
+@using TicketSystem.Team.Grpc
+@using TicketSystem.User.Grpc
 @using TicketSystem.Client.Services
 @inject IssueGrpcClient IssueClient
 @inject UserGrpcClient UserClient

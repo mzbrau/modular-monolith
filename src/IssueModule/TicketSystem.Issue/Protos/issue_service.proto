@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option csharp_namespace = "TicketSystem.Api.Protos";
+option csharp_namespace = "TicketSystem.Issue.Grpc";
 
 package issue;
 
