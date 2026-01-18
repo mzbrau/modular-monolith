@@ -1,16 +1,20 @@
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TicketSystem.Team.Application.Adapters;
+using TicketSystem.Team.Configuration;
 using TicketSystem.Team.Contracts;
 using TicketSystem.Team.Domain;
 using TicketSystem.Team.Infrastructure.Grpc;
-using TicketSystem.Team.Infrastructure;
 
 namespace TicketSystem.Team.Infrastructure.Registration;
 
 public static class TeamModuleRegistration
 {
-    public static IServiceCollection AddTeamModule(this IServiceCollection services)
+    public static IServiceCollection AddTeamModule(this IServiceCollection services, IConfiguration configuration)
     {
+        // Configure TeamSettings from the parent settings
+        services.Configure<TeamSettings>(configuration.GetSection("Team"));
+        
         services.AddScoped<ITeamRepository, TeamRepository>();
         services.AddScoped<Application.TeamService>();
         services.AddScoped<ITeamModuleApi, TeamModuleApiAdapter>();

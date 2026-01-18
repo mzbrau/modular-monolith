@@ -1,6 +1,8 @@
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using NHibernate;
-using NHibernate.Criterion;
 using TicketSystem.Issue.Domain;
 
 namespace TicketSystem.Issue.Infrastructure;

@@ -1,3 +1,5 @@
+using System;
+
 namespace TicketSystem.Issue.Contracts;
 
 public class CreateIssueRequest

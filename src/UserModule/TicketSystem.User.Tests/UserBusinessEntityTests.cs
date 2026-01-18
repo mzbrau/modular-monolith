@@ -1,3 +1,5 @@
+using System;
+using NUnit.Framework;
 using TicketSystem.User.Domain;
 
 namespace TicketSystem.User.Tests;

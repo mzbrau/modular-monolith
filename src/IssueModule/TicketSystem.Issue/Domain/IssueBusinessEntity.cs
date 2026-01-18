@@ -1,3 +1,5 @@
+using System;
+
 namespace TicketSystem.Issue.Domain;
 
 public class IssueBusinessEntity

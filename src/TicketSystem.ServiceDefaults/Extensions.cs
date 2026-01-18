@@ -7,7 +7,6 @@ using OpenTelemetry;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 using Serilog;
-using Serilog.Events;
 
 namespace Microsoft.Extensions.Hosting;
 

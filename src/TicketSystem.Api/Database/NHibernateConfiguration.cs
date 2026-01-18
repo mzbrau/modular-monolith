@@ -1,5 +1,4 @@
 using NHibernate;
-using NHibernate.Cfg;
 using NHibernate.Dialect;
 using NHibernate.Driver;
 
@@ -9,7 +8,7 @@ public static class NHibernateConfiguration
 {
     public static ISessionFactory CreateSessionFactory(string connectionString, IEnumerable<System.Reflection.Assembly> assembliesToScan)
     {
-        var configuration = new Configuration();
+        var configuration = new NHibernate.Cfg.Configuration();
         
         configuration.DataBaseIntegration(db =>
         {

@@ -1,3 +1,5 @@
+using System;
+
 namespace TicketSystem.User.Contracts;
 
 public class UserDataContract

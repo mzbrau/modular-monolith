@@ -1,4 +1,10 @@
+using Fig.Client.ExtensionMethods;
+using Fig.Client.SecretProvider.Docker;
+using Fig.Client.SecretProvider.Dpapi;
+using HealthChecks.UI.Client;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using NHibernate;
+using TicketSystem.Api.Configuration;
 using TicketSystem.Api.Database;
 using TicketSystem.Issue.Infrastructure.Registration;
 using TicketSystem.Team.Infrastructure.Registration;
@@ -6,35 +12,55 @@ using TicketSystem.User.Infrastructure.Registration;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.AddServiceDefaults();
-
 var logger = LoggerFactory.Create(config => config.AddConsole()).CreateLogger("Startup");
 logger.LogInformation("Starting TicketSystem API application");
+
+// Add Fig as a configuration provider before other services
+var loggerFactory = LoggerFactory.Create(builder =>
+{
+    builder.AddConsole();
+});
+
+builder.Configuration.AddFig<TicketSystemSettings>(options =>
+{
+    options.ClientName = "TicketSystemApi";
+    options.LoggerFactory = loggerFactory;
+    options.CommandLineArgs = args;
+    options.ClientSecretProviders = [new DockerSecretProvider(), new DpapiSecretProvider()];
+});
+
+builder.AddServiceDefaults();
 
 // Configure NHibernate
 var dbPath = Path.Combine(builder.Environment.ContentRootPath, "TicketSystem.db");
 var connectionString = $"Data Source={dbPath};Version=3;";
 logger.LogInformation("Database path: {DatabasePath}", dbPath);
 
-var sessionFactory = NHibernateConfiguration.CreateSessionFactory(connectionString, new[]
-{
+var sessionFactory = NHibernateConfiguration.CreateSessionFactory(connectionString, [
     typeof(UserModuleRegistration).Assembly,
     typeof(TeamModuleRegistration).Assembly,
     typeof(IssueModuleRegistration).Assembly
-});
+]);
 
 builder.Services.AddSingleton(sessionFactory);
 builder.Services.AddSingleton(new DatabaseOptions(connectionString));
 builder.Services.AddScoped(sp => sp.GetRequiredService<ISessionFactory>().OpenSession());
 builder.Services.AddSingleton<DatabaseInitializer>();
 
-// Add module registrations
+// Register Fig and configure settings
+builder.Host.UseFig<TicketSystemSettings>();
+builder.Services.Configure<TicketSystemSettings>(builder.Configuration);
+
+// Add module registrations with configuration
 logger.LogInformation("Registering modules: User, Team, Issue");
-builder.Services.AddUserModule();
-builder.Services.AddTeamModule();
-builder.Services.AddIssueModule();
+builder.Services.AddUserModule(builder.Configuration);
+builder.Services.AddTeamModule(builder.Configuration);
+builder.Services.AddIssueModule(builder.Configuration);
 
 // Add gRPC services from modules
+// Add health checks
+builder.Services.AddHealthChecks();
+
 builder.Services.AddUserModuleGrpcServices();
 builder.Services.AddTeamModuleGrpcServices();
 builder.Services.AddIssueModuleGrpcServices();
@@ -53,6 +79,13 @@ using (var scope = app.Services.CreateScope())
     dbInitializer.Initialize();
 }
 
+//Add health check endpoint
+app.MapHealthChecks("/_health", new HealthCheckOptions()
+{
+    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+});
+
+// 
 appLogger.LogInformation("Configuring middleware pipeline");
 
 // Configure middleware for transaction handling
@@ -68,5 +101,6 @@ app.MapGet("/",
     () =>
         "Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
 
-appLogger.LogInformation("TicketSystem API starting on {Urls}", string.Join(", ", builder.Configuration["ASPNETCORE_URLS"]?.Split(';') ?? new[] { "default" }));
+appLogger.LogInformation("TicketSystem API starting on {Urls}", string.Join(", ", builder.Configuration["ASPNETCORE_URLS"]?.Split(';') ??
+    ["default"]));
 app.Run();

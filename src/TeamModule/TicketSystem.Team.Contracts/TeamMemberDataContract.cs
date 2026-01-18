@@ -1,3 +1,5 @@
+using System;
+
 namespace TicketSystem.Team.Contracts;
 
 public class TeamMemberDataContract

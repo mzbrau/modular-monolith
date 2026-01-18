@@ -1,3 +1,7 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Grpc.Core;
 using TicketSystem.Team.Domain;
 
@@ -135,7 +139,7 @@ internal class TeamGrpcService : TeamService.TeamServiceBase
             Description = team.Description ?? string.Empty,
             CreatedDate = team.CreatedDate.ToString("O")
         };
-        message.Members.AddRange(team.Members?.Where(m => m != null).Select(MapMemberToMessage) ?? Enumerable.Empty<TeamMemberMessage>());
+        message.Members.AddRange(team.Members?.Where(m => m != null).Select(MapMemberToMessage) ?? []);
         return message;
     }
 

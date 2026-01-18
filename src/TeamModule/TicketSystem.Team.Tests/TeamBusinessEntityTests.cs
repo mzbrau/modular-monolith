@@ -1,3 +1,5 @@
+using System;
+using NUnit.Framework;
 using TicketSystem.Team.Domain;
 
 namespace TicketSystem.TeamModule.Tests;

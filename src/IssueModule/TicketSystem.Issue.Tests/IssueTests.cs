@@ -1,6 +1,12 @@
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using NSubstitute;
+using Microsoft.Extensions.Options;
+using Moq;
+using NUnit.Framework;
 using TicketSystem.Issue.Application;
+using TicketSystem.Issue.Configuration;
 using TicketSystem.Issue.Domain;
 using TicketSystem.Team.Contracts;
 using TicketSystem.User.Contracts;
@@ -10,20 +16,32 @@ namespace TicketSystem.Issue.Tests;
 [TestFixture]
 public class IssueServiceTests
 {
-    private IIssueRepository _issueRepository = null!;
-    private IUserModuleApi _userModuleApi = null!;
-    private ITeamModuleApi _teamModuleApi = null!;
-    private ILogger<IssueService> _logger = null!;
+    private Mock<IIssueRepository> _issueRepository = null!;
+    private Mock<IUserModuleApi> _userModuleApi = null!;
+    private Mock<ITeamModuleApi> _teamModuleApi = null!;
+    private Mock<ILogger<IssueService>> _logger = null!;
+    private Mock<IOptionsMonitor<IssueSettings>> _settings = null!;
     private IssueService _issueService = null!;
 
     [SetUp]
     public void Setup()
     {
-        _issueRepository = Substitute.For<IIssueRepository>();
-        _userModuleApi = Substitute.For<IUserModuleApi>();
-        _teamModuleApi = Substitute.For<ITeamModuleApi>();
-        _logger = Substitute.For<ILogger<IssueService>>();
-        _issueService = new IssueService(_issueRepository, _userModuleApi, _teamModuleApi, _logger);
+        _issueRepository = new Mock<IIssueRepository>();
+        _userModuleApi = new Mock<IUserModuleApi>();
+        _teamModuleApi = new Mock<ITeamModuleApi>();
+        _logger = new Mock<ILogger<IssueService>>();
+        _settings = new Mock<IOptionsMonitor<IssueSettings>>();
+        
+        // Setup default settings
+        var defaultSettings = new IssueSettings();
+        _settings.Setup(s => s.CurrentValue).Returns(defaultSettings);
+        
+        _issueService = new IssueService(
+            _issueRepository.Object, 
+            _userModuleApi.Object, 
+            _teamModuleApi.Object, 
+            _logger.Object,
+            _settings.Object);
     }
 
     [Test]
@@ -35,15 +53,15 @@ public class IssueServiceTests
         var priority = IssuePriority.High;
         DateTime? dueDate = DateTime.UtcNow.AddDays(7);
         
-        _issueRepository.AddAsync(Arg.Any<IssueBusinessEntity>()).Returns(Task.CompletedTask);
+        _issueRepository.Setup(x => x.AddAsync(It.IsAny<IssueBusinessEntity>())).Returns(Task.CompletedTask);
 
         // Act
         var issueId = await _issueService.CreateIssueAsync(title, description, priority, dueDate);
 
         // Assert
         Assert.That(issueId, Is.GreaterThanOrEqualTo(0));
-        await _issueRepository.Received(1).AddAsync(Arg.Is<IssueBusinessEntity>(t => 
-            t.Title == title && t.Description == description && t.Priority == priority));
+        _issueRepository.Verify(x => x.AddAsync(It.Is<IssueBusinessEntity>(t => 
+            t.Title == title && t.Description == description && t.Priority == priority)), Times.Once);
     }
 
     [Test]
@@ -53,7 +71,7 @@ public class IssueServiceTests
         var issueId = 1L;
         var issue = new IssueBusinessEntity(issueId, "Bug", "Description", IssuePriority.Medium, null);
         
-        _issueRepository.GetByIdAsync(issueId).Returns(issue);
+        _issueRepository.Setup(x => x.GetByIdAsync(issueId)).ReturnsAsync(issue);
 
         // Act
         var result = await _issueService.GetIssueAsync(issueId);
@@ -67,7 +85,7 @@ public class IssueServiceTests
     {
         // Arrange
         var issueId = 1L;
-        _issueRepository.GetByIdAsync(issueId).Returns((IssueBusinessEntity?)null);
+        _issueRepository.Setup(x => x.GetByIdAsync(issueId)).ReturnsAsync((IssueBusinessEntity?)null);
 
         // Act & Assert
         Assert.ThrowsAsync<KeyNotFoundException>(async () => 
@@ -82,16 +100,16 @@ public class IssueServiceTests
         long userId = 1;
         var issue = new IssueBusinessEntity(issueId, "Bug", "Description", IssuePriority.Medium, null);
         
-        _issueRepository.GetByIdAsync(issueId).Returns(issue);
-        _userModuleApi.UserExistsAsync(Arg.Is<UserExistsRequest>(r => r.UserId == userId)).Returns(true);
-        _issueRepository.UpdateAsync(issue).Returns(Task.CompletedTask);
+        _issueRepository.Setup(x => x.GetByIdAsync(issueId)).ReturnsAsync(issue);
+        _userModuleApi.Setup(x => x.UserExistsAsync(It.Is<UserExistsRequest>(r => r.UserId == userId))).ReturnsAsync(true);
+        _issueRepository.Setup(x => x.UpdateAsync(issue)).Returns(Task.CompletedTask);
 
         // Act
         await _issueService.AssignIssueToUserAsync(issueId, userId);
 
         // Assert
         Assert.That(issue.AssignedUserId, Is.EqualTo(userId));
-        await _issueRepository.Received(1).UpdateAsync(issue);
+        _issueRepository.Verify(x => x.UpdateAsync(issue), Times.Once);
     }
 
     [Test]
@@ -102,8 +120,8 @@ public class IssueServiceTests
         long userId = 1;
         var issue = new IssueBusinessEntity(issueId, "Bug", "Description", IssuePriority.Medium, null);
         
-        _issueRepository.GetByIdAsync(issueId).Returns(issue);
-        _userModuleApi.UserExistsAsync(Arg.Is<UserExistsRequest>(r => r.UserId == userId)).Returns(false);
+        _issueRepository.Setup(x => x.GetByIdAsync(issueId)).ReturnsAsync(issue);
+        _userModuleApi.Setup(x => x.UserExistsAsync(It.Is<UserExistsRequest>(r => r.UserId == userId))).ReturnsAsync(false);
 
         // Act & Assert
         Assert.ThrowsAsync<InvalidOperationException>(async () => 
@@ -118,9 +136,9 @@ public class IssueServiceTests
         long teamId = 1;
         var issue = new IssueBusinessEntity(issueId, "Bug", "Description", IssuePriority.Medium, null);
         
-        _issueRepository.GetByIdAsync(issueId).Returns(issue);
-        _teamModuleApi.TeamExistsAsync(Arg.Is<TeamExistsRequest>(r => r.TeamId == teamId)).Returns(true);
-        _issueRepository.UpdateAsync(issue).Returns(Task.CompletedTask);
+        _issueRepository.Setup(x => x.GetByIdAsync(issueId)).ReturnsAsync(issue);
+        _teamModuleApi.Setup(x => x.TeamExistsAsync(It.Is<TeamExistsRequest>(r => r.TeamId == teamId))).ReturnsAsync(true);
+        _issueRepository.Setup(x => x.UpdateAsync(issue)).Returns(Task.CompletedTask);
 
         // Act
         await _issueService.AssignIssueToTeamAsync(issueId, teamId);
@@ -136,8 +154,8 @@ public class IssueServiceTests
         var issueId = 1L;
         var issue = new IssueBusinessEntity(issueId, "Bug", "Description", IssuePriority.Medium, null);
         
-        _issueRepository.GetByIdAsync(issueId).Returns(issue);
-        _issueRepository.UpdateAsync(issue).Returns(Task.CompletedTask);
+        _issueRepository.Setup(x => x.GetByIdAsync(issueId)).ReturnsAsync(issue);
+        _issueRepository.Setup(x => x.UpdateAsync(issue)).Returns(Task.CompletedTask);
 
         // Act
         await _issueService.UpdateIssueStatusAsync(issueId, IssueStatus.InProgress);
@@ -153,13 +171,13 @@ public class IssueServiceTests
         var issueId = 1L;
         var issue = new IssueBusinessEntity(issueId, "Bug", "Description", IssuePriority.Medium, null);
         
-        _issueRepository.GetByIdAsync(issueId).Returns(issue);
-        _issueRepository.DeleteAsync(issue).Returns(Task.CompletedTask);
+        _issueRepository.Setup(x => x.GetByIdAsync(issueId)).ReturnsAsync(issue);
+        _issueRepository.Setup(x => x.DeleteAsync(issue)).Returns(Task.CompletedTask);
 
         // Act
         await _issueService.DeleteIssueAsync(issueId);
 
         // Assert
-        await _issueRepository.Received(1).DeleteAsync(issue);
+        _issueRepository.Verify(x => x.DeleteAsync(issue), Times.Once);
     }
 }

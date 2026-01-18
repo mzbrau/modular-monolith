@@ -1,3 +1,4 @@
+using System.Linq;
 using TicketSystem.Team.Contracts;
 using TicketSystem.Team.Domain;
 

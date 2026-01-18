@@ -7,7 +7,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="NHibernate" Version="5.5.2"/>
+        <PackageReference Include="Fig.Client.SecretProvider.Docker" Version="3.1.1" />
+        <PackageReference Include="Fig.Client.SecretProvider.Dpapi" Version="3.1.1" />
+        <PackageReference Include="NHibernate" Version="5.6.0" />
+        <PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="9.0.0" />
+        <PackageReference Include="Fig.Client" Version="3.1.1" />
     </ItemGroup>
 
     <ItemGroup>

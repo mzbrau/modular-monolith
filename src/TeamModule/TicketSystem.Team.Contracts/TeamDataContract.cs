@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+
 namespace TicketSystem.Team.Contracts;
 
 public class TeamDataContract
@@ -6,5 +9,5 @@ public class TeamDataContract
     public string Name { get; set; } = string.Empty;
     public string? Description { get; set; }
     public DateTime CreatedDate { get; set; }
-    public List<TeamMemberDataContract> Members { get; set; } = new();
+    public List<TeamMemberDataContract> Members { get; set; } = [];
 }

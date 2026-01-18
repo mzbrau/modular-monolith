@@ -1,6 +1,13 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using NSubstitute;
+using Microsoft.Extensions.Options;
+using Moq;
+using NUnit.Framework;
 using TicketSystem.Team.Application;
+using TicketSystem.Team.Configuration;
 using TicketSystem.Team.Domain;
 using TicketSystem.User.Contracts;
 
@@ -9,18 +16,25 @@ namespace TicketSystem.TeamModule.Tests;
 [TestFixture]
 public class TeamServiceTests
 {
-    private ITeamRepository _teamRepository = null!;
-    private IUserModuleApi _userModuleApi = null!;
-    private ILogger<TeamService> _logger = null!;
+    private Mock<ITeamRepository> _teamRepository = null!;
+    private Mock<IUserModuleApi> _userModuleApi = null!;
+    private Mock<ILogger<TeamService>> _logger = null!;
+    private Mock<IOptionsMonitor<TeamSettings>> _settings = null!;
     private TeamService _teamService = null!;
 
     [SetUp]
     public void Setup()
     {
-        _teamRepository = Substitute.For<ITeamRepository>();
-        _userModuleApi = Substitute.For<IUserModuleApi>();
-        _logger = Substitute.For<ILogger<TeamService>>();
-        _teamService = new TeamService(_teamRepository, _userModuleApi, _logger);
+        _teamRepository = new Mock<ITeamRepository>();
+        _userModuleApi = new Mock<IUserModuleApi>();
+        _logger = new Mock<ILogger<TeamService>>();
+        _settings = new Mock<IOptionsMonitor<TeamSettings>>();
+        
+        // Setup default settings
+        var defaultSettings = new TeamSettings();
+        _settings.Setup(s => s.CurrentValue).Returns(defaultSettings);
+        
+        _teamService = new TeamService(_teamRepository.Object, _userModuleApi.Object, _logger.Object, _settings.Object);
     }
 
     [Test]
@@ -30,15 +44,15 @@ public class TeamServiceTests
         const string name = "Development Team";
         const string description = "Main development team";
         
-        _teamRepository.AddAsync(Arg.Any<TeamBusinessEntity>()).Returns(Task.CompletedTask);
+        _teamRepository.Setup(x => x.AddAsync(It.IsAny<TeamBusinessEntity>())).Returns(Task.CompletedTask);
 
         // Act
         var teamId = await _teamService.CreateTeamAsync(name, description);
 
         // Assert
         Assert.That(teamId, Is.EqualTo(0)); // ID is 0 before saving
-        await _teamRepository.Received(1).AddAsync(Arg.Is<TeamBusinessEntity>(t => 
-            t.Name == name && t.Description == description));
+        _teamRepository.Verify(x => x.AddAsync(It.Is<TeamBusinessEntity>(t => 
+            t.Name == name && t.Description == description)), Times.Once);
     }
 
     [Test]
@@ -48,7 +62,7 @@ public class TeamServiceTests
         const long teamId = 1;
         var team = new TeamBusinessEntity(teamId, "Dev Team", "Description");
         
-        _teamRepository.GetByIdAsync(teamId).Returns(team);
+        _teamRepository.Setup(x => x.GetByIdAsync(teamId)).ReturnsAsync(team);
 
         // Act
         var result = await _teamService.GetTeamAsync(teamId);
@@ -62,7 +76,7 @@ public class TeamServiceTests
     {
         // Arrange
         const long teamId = 1;
-        _teamRepository.GetByIdAsync(teamId).Returns((TeamBusinessEntity?)null);
+        _teamRepository.Setup(x => x.GetByIdAsync(teamId)).ReturnsAsync((TeamBusinessEntity?)null);
 
         // Act & Assert
         Assert.ThrowsAsync<KeyNotFoundException>(async () => 
@@ -77,16 +91,16 @@ public class TeamServiceTests
         long userId = 1;
         var team = new TeamBusinessEntity(teamId, "Dev Team", "Description");
         
-        _teamRepository.GetByIdAsync(teamId).Returns(team);
-        _userModuleApi.UserExistsAsync(Arg.Is<UserExistsRequest>(r => r.UserId == userId)).Returns(true);
-        _teamRepository.UpdateAsync(team).Returns(Task.CompletedTask);
+        _teamRepository.Setup(x => x.GetByIdAsync(teamId)).ReturnsAsync(team);
+        _userModuleApi.Setup(x => x.UserExistsAsync(It.Is<UserExistsRequest>(r => r.UserId == userId))).ReturnsAsync(true);
+        _teamRepository.Setup(x => x.UpdateAsync(team)).Returns(Task.CompletedTask);
 
         // Act
         await _teamService.AddMemberToTeamAsync(teamId, userId, TeamRole.Member);
 
         // Assert
         Assert.That(team.Members.Any(m => m.UserId == userId), Is.True);
-        await _teamRepository.Received(1).UpdateAsync(team);
+        _teamRepository.Verify(x => x.UpdateAsync(team), Times.Once);
     }
 
     [Test]
@@ -97,8 +111,8 @@ public class TeamServiceTests
         long userId = 1;
         var team = new TeamBusinessEntity(teamId, "Dev Team", "Description");
         
-        _teamRepository.GetByIdAsync(teamId).Returns(team);
-        _userModuleApi.UserExistsAsync(Arg.Is<UserExistsRequest>(r => r.UserId == userId)).Returns(false);
+        _teamRepository.Setup(x => x.GetByIdAsync(teamId)).ReturnsAsync(team);
+        _userModuleApi.Setup(x => x.UserExistsAsync(It.Is<UserExistsRequest>(r => r.UserId == userId))).ReturnsAsync(false);
 
         // Act & Assert
         Assert.ThrowsAsync<InvalidOperationException>(async () => 
@@ -114,8 +128,8 @@ public class TeamServiceTests
         var team = new TeamBusinessEntity(teamId, "Dev Team", "Description");
         team.AddMember(userId, TeamRole.Member);
         
-        _teamRepository.GetByIdAsync(teamId).Returns(team);
-        _teamRepository.UpdateAsync(team).Returns(Task.CompletedTask);
+        _teamRepository.Setup(x => x.GetByIdAsync(teamId)).ReturnsAsync(team);
+        _teamRepository.Setup(x => x.UpdateAsync(team)).Returns(Task.CompletedTask);
 
         // Act
         await _teamService.RemoveMemberFromTeamAsync(teamId, userId);

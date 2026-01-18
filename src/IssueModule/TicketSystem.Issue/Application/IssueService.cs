@@ -1,4 +1,9 @@
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using TicketSystem.Issue.Configuration;
 using TicketSystem.Issue.Domain;
 using TicketSystem.Team.Contracts;
 using TicketSystem.User.Contracts;
@@ -11,22 +16,46 @@ internal class IssueService
     private readonly IUserModuleApi _userModuleApi;
     private readonly ITeamModuleApi _teamModuleApi;
     private readonly ILogger<IssueService> _logger;
+    private readonly IOptionsMonitor<IssueSettings> _settings;
 
     public IssueService(
         IIssueRepository issueRepository,
         IUserModuleApi userModuleApi,
         ITeamModuleApi teamModuleApi,
-        ILogger<IssueService> logger)
+        ILogger<IssueService> logger,
+        IOptionsMonitor<IssueSettings> settings)
     {
         _issueRepository = issueRepository;
         _userModuleApi = userModuleApi;
         _teamModuleApi = teamModuleApi;
         _logger = logger;
+        _settings = settings;
     }
 
     public async Task<long> CreateIssueAsync(string title, string? description, IssuePriority priority, DateTime? dueDate)
     {
         _logger.LogInformation("Creating issue with title: {Title}, Priority: {Priority}", title, priority);
+        
+        // Get current settings
+        var settings = _settings.CurrentValue;
+        
+        // Validate title length
+        if (string.IsNullOrWhiteSpace(title))
+            throw new ArgumentException("Title cannot be empty.", nameof(title));
+        
+        if (title.Length < settings.MinTitleLength)
+            throw new ArgumentException($"Title must be at least {settings.MinTitleLength} characters long.", nameof(title));
+        
+        if (title.Length > settings.MaxTitleLength)
+            throw new ArgumentException($"Title cannot exceed {settings.MaxTitleLength} characters.", nameof(title));
+        
+        // Validate description length if provided
+        if (!string.IsNullOrEmpty(description) && description.Length > settings.MaxDescriptionLength)
+            throw new ArgumentException($"Description cannot exceed {settings.MaxDescriptionLength} characters.", nameof(description));
+        
+        // Validate due date
+        if (!settings.AllowNoDueDate && !dueDate.HasValue)
+            throw new ArgumentException("Due date is required based on current settings.", nameof(dueDate));
         
         var issue = new IssueBusinessEntity(0, title, description, priority, dueDate);
 
@@ -55,6 +84,27 @@ internal class IssueService
         var issue = await _issueRepository.GetByIdAsync(issueId);
         if (issue == null)
             throw new KeyNotFoundException($"Issue with ID '{issueId}' not found.");
+        
+        // Get current settings
+        var settings = _settings.CurrentValue;
+        
+        // Validate title length
+        if (string.IsNullOrWhiteSpace(title))
+            throw new ArgumentException("Title cannot be empty.", nameof(title));
+        
+        if (title.Length < settings.MinTitleLength)
+            throw new ArgumentException($"Title must be at least {settings.MinTitleLength} characters long.", nameof(title));
+        
+        if (title.Length > settings.MaxTitleLength)
+            throw new ArgumentException($"Title cannot exceed {settings.MaxTitleLength} characters.", nameof(title));
+        
+        // Validate description length if provided
+        if (!string.IsNullOrEmpty(description) && description.Length > settings.MaxDescriptionLength)
+            throw new ArgumentException($"Description cannot exceed {settings.MaxDescriptionLength} characters.", nameof(description));
+        
+        // Validate due date
+        if (!settings.AllowNoDueDate && !dueDate.HasValue)
+            throw new ArgumentException("Due date is required based on current settings.", nameof(dueDate));
 
         issue.Update(title, description, priority, dueDate);
         await _issueRepository.UpdateAsync(issue);
