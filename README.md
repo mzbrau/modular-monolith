@@ -462,12 +462,12 @@ graph LR
     end
     
     subgraph "Forbidden Dependencies"
-        D2[Domain] -.x|cannot reference| A2[Application]
-        D2 -.x|cannot reference| I2[Infrastructure]
-        A2 -.x|cannot reference| I2
-        C2[Contracts] -.x|cannot reference| D3[Domain]
-        C2 -.x|cannot reference| A3[Application]
-        C2 -.x|cannot reference| I3[Infrastructure]
+        D2[Domain] --x|cannot reference| A2[Application]
+        D2 --x|cannot reference| I2[Infrastructure]
+        A2 --x|cannot reference| I2
+        C2[Contracts] --x|cannot reference| D3[Domain]
+        C2 --x|cannot reference| A3[Application]
+        C2 --x|cannot reference| I3[Infrastructure]
     end
     
     style I fill:#FF9800
