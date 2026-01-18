@@ -68,7 +68,21 @@ internal class IssueRepository : IIssueRepository
 
     public async Task UpdateAsync(IssueBusinessEntity issue)
     {
-        await _session.UpdateAsync(issue);
+        // Only call Update for detached entities. If the entity is already tracked by the
+        // current session, calling Update can reset the dirty-check snapshot and prevent
+        // scalar changes (e.g. AssignedUserId) from being persisted.
+        if (!_session.Contains(issue))
+        {
+            await _session.UpdateAsync(issue);
+        }
+
+        // Integration tests call module APIs directly (bypassing the HTTP transaction middleware),
+        // so we can't rely on a request transaction commit to flush updates.
+        // Only flush when there's no active transaction; otherwise the middleware commit will flush.
+        if (_session.Transaction is not { IsActive: true })
+        {
+            await _session.FlushAsync();
+        }
     }
 
     public async Task DeleteAsync(IssueBusinessEntity issue)

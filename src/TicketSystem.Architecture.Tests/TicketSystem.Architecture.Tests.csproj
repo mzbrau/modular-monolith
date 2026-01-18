@@ -31,6 +31,14 @@
         <ProjectReference Include="..\TeamModule\TicketSystem.Team.Contracts\TicketSystem.Team.Contracts.csproj"/>
         <ProjectReference Include="..\IssueModule\TicketSystem.Issue\TicketSystem.Issue.csproj"/>
         <ProjectReference Include="..\IssueModule\TicketSystem.Issue.Contracts\TicketSystem.Issue.Contracts.csproj"/>
+        
+        <!-- Test projects for boundary validation -->
+        <ProjectReference Include="..\UserModule\TicketSystem.User.TestBuilders\TicketSystem.User.TestBuilders.csproj"/>
+        <ProjectReference Include="..\UserModule\TicketSystem.User.IntegrationTests\TicketSystem.User.IntegrationTests.csproj"/>
+        <ProjectReference Include="..\TeamModule\TicketSystem.Team.TestBuilders\TicketSystem.Team.TestBuilders.csproj"/>
+        <ProjectReference Include="..\TeamModule\TicketSystem.Team.IntegrationTests\TicketSystem.Team.IntegrationTests.csproj"/>
+        <ProjectReference Include="..\IssueModule\TicketSystem.Issue.TestBuilders\TicketSystem.Issue.TestBuilders.csproj"/>
+        <ProjectReference Include="..\IssueModule\TicketSystem.Issue.IntegrationTests\TicketSystem.Issue.IntegrationTests.csproj"/>
     </ItemGroup>
 
 </Project>

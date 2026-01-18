@@ -48,7 +48,20 @@ internal class TeamRepository : ITeamRepository
     public async Task UpdateAsync(TeamBusinessEntity team)
     {
         _logger.LogDebug("Updating team in database: {TeamId}, MemberCount: {MemberCount}", team.Id, team.Members.Count);
-        await _session.UpdateAsync(team);
+        // Only call Update for detached entities. If already tracked, updating can interfere
+        // with NHibernate dirty-checking.
+        if (!_session.Contains(team))
+        {
+            await _session.UpdateAsync(team);
+        }
+
+        // Some integration tests invoke module APIs directly (no HTTP transaction middleware),
+        // so ensure changes are flushed to the database.
+        // Only flush when there is no active transaction; otherwise the request transaction commit will flush.
+        if (_session.Transaction is not { IsActive: true })
+        {
+            await _session.FlushAsync();
+        }
         _logger.LogDebug("Team updated in database: {TeamId}", team.Id);
     }
 }

@@ -9,6 +9,7 @@ This project showcases a **modular monolith architecture** for a simple ticket m
 ### The Application
 
 The TicketSystem is a basic issue tracking application with three core capabilities:
+
 - **Issue Management**: Create, assign, and track issues
 - **Team Management**: Organize users into teams
 - **User Management**: Manage user accounts and assignments
@@ -22,6 +23,7 @@ The application exposes gRPC services and uses NHibernate with SQLite for data p
 ### What is a Modular Monolith?
 
 A modular monolith is a single deployable unit (monolith) that is internally organized into **independent, loosely-coupled modules**. Each module:
+
 - Has clear boundaries and responsibilities
 - Exposes a well-defined public API (Contracts)
 - Hides internal implementation details
@@ -76,11 +78,12 @@ graph TB
 
 ---
 
-## 📦 Module Structure
+## Module Structure
 
 Each module follows a consistent three-project structure:
 
 ### 1. **Main Project** (`TicketSystem.[Module]`)
+
 Contains the module's implementation organized into three **folders** (not separate projects):
 
 ```mermaid
@@ -101,6 +104,7 @@ graph LR
 ```
 
 **Why folders instead of separate projects?**
+
 - **Reduced project sprawl**: With 3 modules × 3 layers = 9 projects, plus contracts and tests, we'd have 15+ projects
 - **Simplified management**: One `.csproj` per module instead of three
 - **Easier refactoring**: Moving code between layers doesn't require changing project references
@@ -109,17 +113,19 @@ graph LR
 **Trade-off**: We rely on architecture tests and discipline rather than compiler enforcement for layer separation.
 
 ### 2. **Contracts Project** (`TicketSystem.[Module].Contracts`)
+
 - Defines the module's **public API** (interfaces, DTOs, requests/responses)
 - The **only** part of the module that other modules can reference
 - Keeps modules loosely coupled through well-defined contracts
 
 ### 3. **Tests Project** (`TicketSystem.[Module].Tests`)
+
 - Unit and integration tests for the module
 - Tests business logic independently
 
 ---
 
-## 🔍 Layer Responsibilities & Dependencies
+## Layer Responsibilities & Dependencies
 
 Understanding what belongs in each layer and how they interact is crucial for maintaining clean architecture.
 
@@ -193,7 +199,7 @@ graph TB
 
 ### What Goes Into Each Layer
 
-#### 📘 Contracts Project (Separate Project)
+#### Contracts Project (Separate Project)
 
 **Purpose**: Define the module's public API that other modules and the API layer can use.
 
@@ -217,10 +223,12 @@ graph TB
 - Can be published as a NuGet package for external consumers
 
 **Dependencies**: 
+
 - ✅ Can reference: .NET BCL only (no domain logic, no other modules)
 - ❌ Cannot reference: Any internal module code, other module contracts (keep DTOs independent)
 
 **Example**:
+
 ```csharp
 // IIssueModuleApi.cs
 public interface IIssueModuleApi
@@ -240,7 +248,7 @@ public record IssueDataContract(
 
 ---
 
-#### 🟢 Domain Folder (Core Business Logic)
+#### Domain Folder (Core Business Logic)
 
 **Purpose**: Contains pure business logic that's independent of infrastructure, frameworks, and delivery mechanisms.
 
@@ -264,16 +272,19 @@ public record IssueDataContract(
   - Status codes, types, categories
 
 **Why it exists?**
+
 - **Business logic stays independent** of how data is stored or accessed
 - **Testable in isolation** - no database, no web framework needed
 - **Reusable** - same logic works regardless of delivery mechanism (API, CLI, background job)
 - **Expressive** - code speaks the business language (Domain-Driven Design)
 
-**Dependencies**: 
+**Dependencies**:
+
 - ✅ Can reference: Other domain objects within the same module, .NET BCL
 - ❌ Cannot reference: Application, Infrastructure, Contracts, any external libraries (EF, NHibernate, ASP.NET, etc.)
 
 **Example**:
+
 ```csharp
 // IssueBusinessEntity.cs (Domain)
 public class IssueBusinessEntity
@@ -300,11 +311,12 @@ public class IssueBusinessEntity
 
 ---
 
-#### 🔵 Application Folder (Use Cases & Orchestration)
+#### Application Folder (Use Cases & Orchestration)
 
 **Purpose**: Orchestrate domain objects to fulfill specific use cases. This is the "application business logic" layer.
 
 **Contents**:
+
 - **Application Services** (`UserService`, `IssueService`)
   - Implement use cases (create user, assign issue, etc.)
   - Orchestrate domain entities and repository calls
@@ -322,16 +334,19 @@ public class IssueBusinessEntity
   - Abstractions for complex use cases
 
 **Why it exists?**
+
 - **Coordinates workflows** - knows how to orchestrate domain objects
 - **Defines abstractions** - tells infrastructure what it needs (interfaces) without depending on implementation
 - **Transaction management** - defines transaction boundaries
 - **Adapts** between domain and external world (Contracts, Infrastructure)
 
-**Dependencies**: 
+**Dependencies**:
+
 - ✅ Can reference: Domain layer, Contracts (for DTO mapping), .NET BCL
 - ❌ Cannot reference: Infrastructure layer (uses interfaces instead)
 
 **Example**:
+
 ```csharp
 // IIssueRepository.cs (Application - Interface)
 public interface IIssueRepository
@@ -358,11 +373,12 @@ public class IssueService
 
 ---
 
-#### 🟠 Infrastructure Folder (Implementation Details)
+#### Infrastructure Folder (Implementation Details)
 
 **Purpose**: Implement all external concerns - data access, external services, framework-specific code.
 
 **Contents**:
+
 - **Repository Implementations** (`UserRepository`, `IssueRepository`)
   - Implement interfaces from Application layer
   - Handle data access (NHibernate, EF Core, Dapper)
@@ -385,16 +401,19 @@ public class IssueService
 - **Database Migrations** (if used)
 
 **Why it exists?**
+
 - **Isolation** - all "dirty" infrastructure code is here
 - **Replaceability** - can swap ORM, database, external service without touching business logic
 - **Testing** - can mock infrastructure for testing domain/application
 - **Framework coupling** - only place that knows about NHibernate, gRPC, etc.
 
-**Dependencies**: 
+**Dependencies**:
+
 - ✅ Can reference: Domain, Application, Contracts, external libraries (NHibernate, Grpc, etc.)
 - ❌ Cannot reference: Other modules' internals (only their Contracts)
 
 **Example**:
+
 ```csharp
 // IssueRepository.cs (Infrastructure - Implementation)
 public class IssueRepository : IIssueRepository
@@ -465,6 +484,7 @@ graph LR
 ```
 
 **The Golden Rule**: Dependencies always point inward toward the Domain
+
 - Domain is the center - it depends on nothing
 - Application depends on Domain
 - Infrastructure depends on both (implements their interfaces)
@@ -583,7 +603,7 @@ These tests run in CI/CD pipelines, failing the build if boundaries are violated
 
 ---
 
-## ⚠️ Risks Without These Constraints
+## Risks Without These Constraints
 
 ### The "Big Ball of Mud" Anti-Pattern
 
@@ -630,34 +650,40 @@ graph TD
 
 ---
 
-## ✅ Benefits of This Architecture
+## Benefits of This Architecture
 
 ### 1. **Maintainability**
+
 - Clear separation of concerns makes code easier to understand
 - Changes are localized to specific modules
 - New developers can focus on one module at a time
 
 ### 2. **Testability**
+
 - Modules can be tested independently
 - Architecture tests prevent accidental coupling
 - Mock implementations of contracts enable isolated testing
 
 ### 3. **Scalability (Team)**
+
 - Different teams can own different modules
 - Reduced coordination overhead
 - Clear API contracts reduce merge conflicts
 
 ### 4. **Flexibility**
+
 - Modules can be extracted into microservices if needed
 - Can deploy as monolith initially, split later
 - Technology choices can differ per module (within reason)
 
 ### 5. **Development Speed**
+
 - Enforced boundaries prevent shortcuts that create technical debt
 - Well-defined APIs reduce integration issues
 - Parallel development is safer
 
 ### 6. **Reduced Cognitive Load**
+
 ```mermaid
 graph LR
     subgraph "Developer Working on Issue Module"
@@ -683,9 +709,11 @@ graph LR
 ## Key Design Decisions
 
 ### 1. Folder-Based Layers
+
 **Decision**: Use folders (Domain, Application, Infrastructure) within each module project
 
 **Rationale**:
+
 - Prevents project explosion (15+ projects → 9 projects)
 - Easier to manage and navigate
 - Simplifies build configuration
@@ -693,35 +721,43 @@ graph LR
 **Enforcement**: Architecture tests ensure layers don't violate dependencies despite being in one project
 
 ### 2. Contract-Based Module Communication
+
 **Decision**: Modules only interact through explicit Contract projects
 
 **Rationale**:
+
 - Forces clear API design
 - Prevents implementation details from leaking
 - Enables mocking and testing
 - Documents module capabilities
 
 ### 3. One-Way Dependencies
+
 **Decision**: Strict module dependency hierarchy (Issue → Team → User)
 
 **Rationale**:
+
 - Prevents circular dependencies
 - Makes module extraction possible
 - Creates clear layers of abstraction
 
 ### 4. gRPC for Module APIs
+
 **Decision**: Use gRPC services for module-to-module communication
 
 **Rationale**:
+
 - Well-defined service contracts
 - Can easily evolve to remote calls if modules are split
 - Type-safe communication
 - Good for future microservices migration
 
 ### 5. Shared Database with NHibernate
+
 **Decision**: Single database with NHibernate ORM, separate mappings per module
 
 **Rationale**:
+
 - Simplicity of deployment and transactions
 - Performance (no network overhead)
 - Each module still owns its own tables
@@ -732,6 +768,7 @@ graph LR
 ## Getting Started
 
 ### Prerequisites
+
 - .NET 10.0 SDK
 - SQLite (included)
 
@@ -755,9 +792,160 @@ These tests will fail if any architectural boundaries are violated.
 
 ---
 
-## 📚 Project Structure Reference
+## Integration Testing Strategy (Factory + Test Builders)
 
+Integration tests in this repo are designed to be:
+
+- **Fast to write** (fluent builders + shared fixture)
+- **End-to-end** (exercise real module APIs wired through DI)
+- **Boundary-safe** (test projects are prevented from “cheating” by referencing module internals)
+
+### How the testing solution is structured
+
+There are three key pieces:
+
+1) **Common test infrastructure**: `src/Testing/TicketSystem.Testing.Common/`
+
+- Provides `TicketSystemWebApplicationFactory` (a single in-memory test server + DI container)
+- Disables Fig for tests and injects reloadable test config
+- Creates an isolated SQLite database file per test run and cleans it between tests/classes
+- Provides `IntegrationTestFixture` + `ModuleTestBase` for consistent setup/cleanup
+
+1) **Per-module TestBuilders**: `src/*Module/TicketSystem.*.TestBuilders/`
+
+- Contain fluent builders + seeders for that module’s *public* API
+- Reference **only**:
+  - `TicketSystem.Testing.Common`
+  - that module’s `*.Contracts`
+- Never reference Domain/Application/Infrastructure (enforced by architecture tests)
+
+1) **Per-module IntegrationTests**: `src/*Module/TicketSystem.*.IntegrationTests/`
+
+- Contain tests for the module (and cross-module scenarios when needed)
+- Can reference `TicketSystem.Testing.Common` and any module’s `*.TestBuilders`
+- Must still avoid referencing any module’s internal namespaces (enforced by architecture tests)
+
+### Dependency diagram (what can reference what)
+
+```mermaid
+graph TB
+    subgraph Common[Testing Infrastructure]
+        TC[TicketSystem.Testing.Common]
+    end
+
+    subgraph Builders[Test Data Builders]
+        UTB[User.TestBuilders]
+        TTB[Team.TestBuilders]
+        ITB[Issue.TestBuilders]
+    end
+
+    subgraph Tests[Integration Test Projects]
+        UIT[User.IntegrationTests]
+        TIT[Team.IntegrationTests]
+        IIT[Issue.IntegrationTests]
+    end
+
+    subgraph Contracts[Module Public APIs]
+        UC[User.Contracts]
+        TCt[Team.Contracts]
+        IC[Issue.Contracts]
+    end
+
+    TC --> UTB
+    TC --> TTB
+    TC --> ITB
+
+    UTB --> UC
+    TTB --> TCt
+    ITB --> IC
+
+    TC --> UIT
+    TC --> TIT
+    TC --> IIT
+
+    UTB --> UIT
+    TTB --> TIT
+    ITB --> IIT
+
+    UTB --> IIT
+    TTB --> IIT
+    UC --> IIT
+    TCt --> IIT
+    IC --> IIT
 ```
+
+### Runtime flow (how a typical test works)
+
+```mermaid
+sequenceDiagram
+    participant Test as Integration test
+    participant Base as ModuleTestBase
+    participant Fix as IntegrationTestFixture
+    participant Waf as TicketSystemWebApplicationFactory
+    participant DI as ASP.NET DI Container
+    participant Api as I*ModuleApi (Contracts)
+    participant Db as SQLite test DB
+
+    Test->>Base: inherits
+    Base->>Fix: uses shared Factory + DatabaseManager
+    Fix->>Waf: starts test host once per assembly
+    Test->>DI: GetService<IUserModuleApi>()
+    DI-->>Test: IUserModuleApi
+    Test->>Api: CreateUser / CreateTeam / CreateIssue...
+    Api->>Db: real persistence
+    Base->>Db: cleanup strategy (per test or per class)
+```
+
+### Writing tests without breaking module boundaries
+
+The rule of thumb is: **cross-module setup goes through module APIs**, not through repositories/domain types.
+
+Example pattern (from an Issue-module scenario):
+
+```csharp
+// Arrange
+var issueApi = GetService<IIssueModuleApi>();
+var userApi = GetService<IUserModuleApi>();
+
+var users = new UserTestDataSeeder(userApi);
+var issues = new IssueTestDataSeeder(issueApi);
+
+var user = await users.AUser().CreateAndGetAsync();
+var issue = await issues.AnIssue().AssignedToUser(user.UserId).CreateAndGetAsync();
+
+// Act + Assert via module APIs...
+```
+
+### Running integration tests
+
+Run a module’s integration tests directly:
+
+```bash
+dotnet test src/UserModule/TicketSystem.User.IntegrationTests/TicketSystem.User.IntegrationTests.csproj
+dotnet test src/TeamModule/TicketSystem.Team.IntegrationTests/TicketSystem.Team.IntegrationTests.csproj
+dotnet test src/IssueModule/TicketSystem.Issue.IntegrationTests/TicketSystem.Issue.IntegrationTests.csproj
+```
+
+Or run a single test by name (NUnit filter):
+
+```bash
+dotnet test src/IssueModule/TicketSystem.Issue.IntegrationTests/TicketSystem.Issue.IntegrationTests.csproj \
+    --filter FullyQualifiedName~TicketSystem.Issue.IntegrationTests
+```
+
+### Adding a new builder / seeder
+
+- Put it in the owning module’s `*.TestBuilders` project.
+- Keep references limited to `TicketSystem.Testing.Common` + that module’s `*.Contracts`.
+- Make it create data by calling the module’s `I*ModuleApi` (not internals).
+
+Architecture enforcement lives in [src/TicketSystem.Architecture.Tests/TestProjectBoundaryTests.cs](src/TicketSystem.Architecture.Tests/TestProjectBoundaryTests.cs).
+
+---
+
+## Project Structure Reference
+
+```bash
 src/
 ├── TicketSystem.Api/                  # API composition root
 ├── TicketSystem.AppHost/              # Aspire orchestration
@@ -780,9 +968,10 @@ src/
 
 ---
 
-## 🎓 Learning Resources
+## Learning Resources
 
 This architecture demonstrates:
+
 - **Modular Monolith** patterns
 - **Clean Architecture** principles (within each module)
 - **Domain-Driven Design** (bounded contexts as modules)
@@ -793,15 +982,16 @@ This architecture demonstrates:
 ### When to Use This Architecture
 
 ✅ **Good fit when:**
+
 - Building a new application with room to grow
 - Want modularity without microservices complexity
 - Need clear team boundaries in a monolith
 - Planning for potential future service extraction
 
 ❌ **Might be overkill when:**
+
 - Building a small prototype or MVP
 - Application is truly simple with no growth expected
 - Team is very small (1-2 developers)
 
 ---
-

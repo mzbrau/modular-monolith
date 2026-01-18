@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <LangVersion>latest</LangVersion>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <!-- Testing packages -->
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="10.0.0" />
+        <PackageReference Include="Fig.Client.Testing" Version="3.1.1" />
+        <PackageReference Include="NUnit" Version="4.4.0" />
+        <PackageReference Include="Grpc.Net.Client" Version="2.76.0" />
+        <PackageReference Include="NHibernate" Version="5.6.0" />
+        
+        <!-- Reference the API project for WebApplicationFactory<Program> -->
+        <ProjectReference Include="..\..\TicketSystem.Api\TicketSystem.Api.csproj" />
+        
+        <!-- Reference ALL contract projects (needed for IModuleApi access) -->
+        <ProjectReference Include="..\..\UserModule\TicketSystem.User.Contracts\TicketSystem.User.Contracts.csproj" />
+        <ProjectReference Include="..\..\TeamModule\TicketSystem.Team.Contracts\TicketSystem.Team.Contracts.csproj" />
+        <ProjectReference Include="..\..\IssueModule\TicketSystem.Issue.Contracts\TicketSystem.Issue.Contracts.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Using Include="NUnit.Framework"/>
+    </ItemGroup>
+
+</Project>

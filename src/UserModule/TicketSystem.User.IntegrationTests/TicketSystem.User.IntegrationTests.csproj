@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <LangVersion>latest</LangVersion>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="coverlet.collector" Version="6.0.4"/>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
+        <PackageReference Include="NUnit" Version="4.4.0" />
+        <PackageReference Include="NUnit.Analyzers" Version="4.11.2">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="NUnit3TestAdapter" Version="6.1.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Using Include="NUnit.Framework"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <!-- Shared testing infrastructure -->
+        <ProjectReference Include="..\..\Testing\TicketSystem.Testing.Common\TicketSystem.Testing.Common.csproj" />
+        
+        <!-- This module's contracts (for type access in tests) -->
+        <ProjectReference Include="..\TicketSystem.User.Contracts\TicketSystem.User.Contracts.csproj" />
+        
+        <!-- Test builders for this module -->
+        <ProjectReference Include="..\TicketSystem.User.TestBuilders\TicketSystem.User.TestBuilders.csproj" />
+    </ItemGroup>
+
+</Project>
