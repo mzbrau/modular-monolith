@@ -32,9 +32,13 @@ builder.Configuration.AddFig<TicketSystemSettings>(options =>
 builder.AddServiceDefaults();
 
 // Configure NHibernate
-var dbPath = Path.Combine(builder.Environment.ContentRootPath, "TicketSystem.db");
-var connectionString = $"Data Source={dbPath};Version=3;";
-logger.LogInformation("Database path: {DatabasePath}", dbPath);
+// Check if DatabaseOptions is already registered (e.g., by test configuration)
+var existingDbOptions = builder.Services.FirstOrDefault(d => d.ServiceType == typeof(DatabaseOptions));
+var connectionString = existingDbOptions != null 
+    ? ((DatabaseOptions)existingDbOptions.ImplementationInstance!).ConnectionString
+    : $"Data Source={Path.Combine(builder.Environment.ContentRootPath, "TicketSystem.db")};Version=3;";
+
+logger.LogInformation("Database connection string: {ConnectionString}", connectionString);
 
 var sessionFactory = NHibernateConfiguration.CreateSessionFactory(connectionString, [
     typeof(UserModuleRegistration).Assembly,
@@ -43,7 +47,11 @@ var sessionFactory = NHibernateConfiguration.CreateSessionFactory(connectionStri
 ]);
 
 builder.Services.AddSingleton(sessionFactory);
-builder.Services.AddSingleton(new DatabaseOptions(connectionString));
+// Only add DatabaseOptions if not already registered
+if (existingDbOptions == null)
+{
+    builder.Services.AddSingleton(new DatabaseOptions(connectionString));
+}
 builder.Services.AddScoped(sp => sp.GetRequiredService<ISessionFactory>().OpenSession());
 builder.Services.AddSingleton<DatabaseInitializer>();
 
