@@ -1,5 +1,6 @@
-using System.Reflection;
 using NetArchTest.Rules;
+using System.Reflection;
+using TicketSystem.Architecture.Tests.ExtensionMethods;
 
 namespace TicketSystem.Architecture.Tests;
 
@@ -35,8 +36,8 @@ public class TestProjectBoundaryTests
                 "TicketSystem.Issue.Infrastructure")
             .GetResult();
 
-        AssertArchitectureResult(result, 
-            "TestBuilders should only reference Contracts, not internal modules");
+        var errorMessage = "TestBuilders should only reference Contracts, not internal modules";
+        Assert.That(result.IsSuccessful, Is.True, result.GetDetails(errorMessage));
     }
 
     [Test]
@@ -50,8 +51,8 @@ public class TestProjectBoundaryTests
                 "TicketSystem.User.Infrastructure")
             .GetResult();
 
-        AssertArchitectureResult(result, 
-            "User.IntegrationTests should use contracts and builders, not internal modules");
+        var errorMessage = "User.IntegrationTests should use contracts and builders, not internal modules";
+        Assert.That(result.IsSuccessful, Is.True, result.GetDetails(errorMessage));
     }
 
     [Test]
@@ -65,8 +66,8 @@ public class TestProjectBoundaryTests
                 "TicketSystem.Team.Infrastructure")
             .GetResult();
 
-        AssertArchitectureResult(result, 
-            "Team.IntegrationTests should use contracts and builders, not internal modules");
+        var errorMessage = "Team.IntegrationTests should use contracts and builders, not internal modules";
+        Assert.That(result.IsSuccessful, Is.True, result.GetDetails(errorMessage));
     }
 
     [Test]
@@ -80,8 +81,8 @@ public class TestProjectBoundaryTests
                 "TicketSystem.Issue.Infrastructure")
             .GetResult();
 
-        AssertArchitectureResult(result, 
-            "Issue.IntegrationTests should use contracts and builders, not internal modules");
+        var errorMessage = "Issue.IntegrationTests should use contracts and builders, not internal modules";
+        Assert.That(result.IsSuccessful, Is.True, result.GetDetails(errorMessage));
     }
 
     [Test]
@@ -99,8 +100,8 @@ public class TestProjectBoundaryTests
                 "TicketSystem.Team.Infrastructure")
             .GetResult();
 
-        AssertArchitectureResult(result, 
-            "Issue.IntegrationTests should not reference User or Team module internals");
+        var errorMessage = "Issue.IntegrationTests should not reference User or Team module internals";
+        Assert.That(result.IsSuccessful, Is.True, result.GetDetails(errorMessage));
     }
 
     [Test]
@@ -116,8 +117,8 @@ public class TestProjectBoundaryTests
                 "TicketSystem.Issue")
             .GetResult();
 
-        AssertArchitectureResult(result, 
-            "Team.IntegrationTests should not reference other module internals");
+        var errorMessage = "Team.IntegrationTests should not reference other module internals";
+        Assert.That(result.IsSuccessful, Is.True, result.GetDetails(errorMessage));
     }
 
     [Test]
@@ -133,17 +134,5 @@ public class TestProjectBoundaryTests
         Assert.That(builderTypes.Any(), 
             Is.True, 
             "TestBuilders should reference Testing.Common");
-    }
-
-    private static void AssertArchitectureResult(TestResult result, string errorMessage)
-    {
-        if (result is { IsSuccessful: false, FailingTypes: not null })
-        {
-            var failingTypes = string.Join("\n  - ", 
-                result.FailingTypes.Select(t => t.FullName));
-            errorMessage += $"\n\nFailing types:\n  - {failingTypes}";
-        }
-
-        Assert.That(result.IsSuccessful, Is.True, errorMessage);
     }
 }

@@ -1,5 +1,6 @@
 using System.Reflection;
 using NetArchTest.Rules;
+using TicketSystem.Architecture.Tests.ExtensionMethods;
 
 namespace TicketSystem.Architecture.Tests;
 
@@ -19,13 +20,7 @@ public class ModuleBoundaryTests
             .GetResult();
 
         var errorMessage = "User module should not reference Team module";
-        if (!result.IsSuccessful && result.FailingTypes != null)
-        {
-            var failingTypes = string.Join("\n  - ", result.FailingTypes.Select(t => t.FullName));
-            errorMessage += $"\n\nFailing types:\n  - {failingTypes}";
-        }
-
-        Assert.That(result.IsSuccessful, Is.True, errorMessage);
+        Assert.That(result.IsSuccessful, Is.True, result.GetDetails(errorMessage));
     }
 
     [Test]
@@ -37,13 +32,7 @@ public class ModuleBoundaryTests
             .GetResult();
 
         var errorMessage = "User module should not reference Issue module";
-        if (!result.IsSuccessful && result.FailingTypes != null)
-        {
-            var failingTypes = string.Join("\n  - ", result.FailingTypes.Select(t => t.FullName));
-            errorMessage += $"\n\nFailing types:\n  - {failingTypes}";
-        }
-
-        Assert.That(result.IsSuccessful, Is.True, errorMessage);
+        Assert.That(result.IsSuccessful, Is.True, result.GetDetails(errorMessage));
     }
 
     [Test]
@@ -55,13 +44,7 @@ public class ModuleBoundaryTests
             .GetResult();
 
         var errorMessage = "Team module should not reference Issue module";
-        if (!result.IsSuccessful && result.FailingTypes != null)
-        {
-            var failingTypes = string.Join("\n  - ", result.FailingTypes.Select(t => t.FullName));
-            errorMessage += $"\n\nFailing types:\n  - {failingTypes}";
-        }
-
-        Assert.That(result.IsSuccessful, Is.True, errorMessage);
+        Assert.That(result.IsSuccessful, Is.True, result.GetDetails(errorMessage));
     }
 
     [Test]
@@ -73,13 +56,7 @@ public class ModuleBoundaryTests
             .GetResult();
 
         var errorMessage = "Team module should not reference User.Domain directly";
-        if (!result.IsSuccessful && result.FailingTypes != null)
-        {
-            var failingTypes = string.Join("\n  - ", result.FailingTypes.Select(t => t.FullName));
-            errorMessage += $"\n\nFailing types:\n  - {failingTypes}";
-        }
-
-        Assert.That(result.IsSuccessful, Is.True, errorMessage);
+        Assert.That(result.IsSuccessful, Is.True, result.GetDetails(errorMessage));
     }
 
     [Test]
@@ -91,13 +68,7 @@ public class ModuleBoundaryTests
             .GetResult();
 
         var errorMessage = "Team module should not reference User.Application directly";
-        if (!result.IsSuccessful && result.FailingTypes != null)
-        {
-            var failingTypes = string.Join("\n  - ", result.FailingTypes.Select(t => t.FullName));
-            errorMessage += $"\n\nFailing types:\n  - {failingTypes}";
-        }
-
-        Assert.That(result.IsSuccessful, Is.True, errorMessage);
+        Assert.That(result.IsSuccessful, Is.True, result.GetDetails(errorMessage));
     }
 
     [Test]
@@ -109,13 +80,7 @@ public class ModuleBoundaryTests
             .GetResult();
 
         var errorMessage = "Issue module should not reference User.Domain directly";
-        if (!result.IsSuccessful && result.FailingTypes != null)
-        {
-            var failingTypes = string.Join("\n  - ", result.FailingTypes.Select(t => t.FullName));
-            errorMessage += $"\n\nFailing types:\n  - {failingTypes}";
-        }
-
-        Assert.That(result.IsSuccessful, Is.True, errorMessage);
+        Assert.That(result.IsSuccessful, Is.True, result.GetDetails(errorMessage));
     }
 
     [Test]
@@ -127,13 +92,7 @@ public class ModuleBoundaryTests
             .GetResult();
 
         var errorMessage = "Issue module should not reference User.Application directly";
-        if (!result.IsSuccessful && result.FailingTypes != null)
-        {
-            var failingTypes = string.Join("\n  - ", result.FailingTypes.Select(t => t.FullName));
-            errorMessage += $"\n\nFailing types:\n  - {failingTypes}";
-        }
-
-        Assert.That(result.IsSuccessful, Is.True, errorMessage);
+        Assert.That(result.IsSuccessful, Is.True, result.GetDetails(errorMessage));
     }
 
     [Test]
@@ -145,13 +104,7 @@ public class ModuleBoundaryTests
             .GetResult();
 
         var errorMessage = "Issue module should not reference Team.Domain directly";
-        if (!result.IsSuccessful && result.FailingTypes != null)
-        {
-            var failingTypes = string.Join("\n  - ", result.FailingTypes.Select(t => t.FullName));
-            errorMessage += $"\n\nFailing types:\n  - {failingTypes}";
-        }
-
-        Assert.That(result.IsSuccessful, Is.True, errorMessage);
+        Assert.That(result.IsSuccessful, Is.True, result.GetDetails(errorMessage));
     }
 
     [Test]
@@ -163,12 +116,6 @@ public class ModuleBoundaryTests
             .GetResult();
 
         var errorMessage = "Issue module should not reference Team.Application directly";
-        if (!result.IsSuccessful && result.FailingTypes != null)
-        {
-            var failingTypes = string.Join("\n  - ", result.FailingTypes.Select(t => t.FullName));
-            errorMessage += $"\n\nFailing types:\n  - {failingTypes}";
-        }
-
-        Assert.That(result.IsSuccessful, Is.True, errorMessage);
+        Assert.That(result.IsSuccessful, Is.True, result.GetDetails(errorMessage));
     }
 }

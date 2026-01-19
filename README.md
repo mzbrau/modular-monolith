@@ -35,9 +35,9 @@ This architecture provides many benefits of microservices (modularity, clear bou
 ### High-Level Architecture
 
 ```mermaid
-graph TB
-    subgraph "TicketSystem Application"
-        API[API Layer<br/>TicketSystem.Api]
+graph LR
+    
+    subgraph "TicketSystem Api"
         
         subgraph "User Module"
             UC[User.Contracts]
@@ -55,9 +55,11 @@ graph TB
         end
     end
     
-    API -->|uses| UC
-    API -->|uses| TC
-    API -->|uses| IC
+    CLI[Client Layer<br/>TicketSystem.Client]
+    
+    CLI -->|uses| UC
+    CLI -->|uses| TC
+    CLI -->|uses| IC
     
     TM -.->|references| UC
     IM -.->|references| UC
@@ -66,14 +68,6 @@ graph TB
     UM -->|exposes| UC
     TM -->|exposes| TC
     IM -->|exposes| IC
-    
-    style API fill:#e1f5ff
-    style UC fill:#d4edda
-    style TC fill:#d4edda
-    style IC fill:#d4edda
-    style UM fill:#fff3cd
-    style TM fill:#fff3cd
-    style IM fill:#fff3cd
 ```
 
 ---
@@ -502,19 +496,19 @@ The architecture enforces strict boundaries between modules to prevent coupling:
 graph TB
     subgraph "Allowed Dependencies"
         direction LR
-        IM[Issue Module] -.->|references| UC[User Contracts]
-        IM -.->|references| TC[Team Contracts]
-        TM[Team Module] -.->|references| UC
+        IM[Issue Module] -->|references| UC[User Contracts]
+        IM -->|references| TC[Team Contracts]
+        TM[Team Module] -->|references| UC
     end
     
     subgraph "Blocked Dependencies"
         direction LR
-        UM[User Module] -.x|cannot reference| TM2[Team Module]
-        UM -.x|cannot reference| IM2[Issue Module]
-        TM3[Team Module] -.x|cannot reference| IM3[Issue Module]
+        UM[User Module] --x|cannot reference| TM2[Team Module]
+        UM --x|cannot reference| IM2[Issue Module]
+        TM3[Team Module] --x|cannot reference| IM3[Issue Module]
         
-        IM4[Issue Module] -.x|cannot directly reference| UD[User Domain]
-        IM4 -.x|cannot directly reference| UA[User Application]
+        IM4[Issue Module] --x|cannot directly reference| UD[User Domain]
+        IM4 --x|cannot directly reference| UA[User Application]
     end
     
     style UC fill:#d4edda

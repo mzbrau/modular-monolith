@@ -1,9 +1,9 @@
 using Fig.Client;
 using Fig.Client.Abstractions.Attributes;
 using Fig.Client.Abstractions.Enums;
-using TicketSystem.Issue.Configuration;
-using TicketSystem.Team.Configuration;
-using TicketSystem.User.Configuration;
+using TicketSystem.Issue.Application.Configuration;
+using TicketSystem.Team.Application.Configuration;
+using TicketSystem.User.Application.Configuration;
 
 namespace TicketSystem.Api.Configuration;
 

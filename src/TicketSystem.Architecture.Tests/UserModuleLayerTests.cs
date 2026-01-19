@@ -1,5 +1,6 @@
-using System.Reflection;
 using NetArchTest.Rules;
+using System.Reflection;
+using TicketSystem.Architecture.Tests.ExtensionMethods;
 
 namespace TicketSystem.Architecture.Tests;
 
@@ -19,13 +20,7 @@ public class UserModuleLayerTests
             .GetResult();
 
         var errorMessage = "Domain layer should not depend on Application layer";
-        if (!result.IsSuccessful && result.FailingTypes != null)
-        {
-            var failingTypes = string.Join("\n  - ", result.FailingTypes.Select(t => t.FullName));
-            errorMessage += $"\n\nFailing types:\n  - {failingTypes}";
-        }
-
-        Assert.That(result.IsSuccessful, Is.True, errorMessage);
+        Assert.That(result.IsSuccessful, Is.True, result.GetDetails(errorMessage));
     }
 
     [Test]
@@ -39,13 +34,7 @@ public class UserModuleLayerTests
             .GetResult();
 
         var errorMessage = "Domain layer should not depend on Infrastructure layer";
-        if (!result.IsSuccessful && result.FailingTypes != null)
-        {
-            var failingTypes = string.Join("\n  - ", result.FailingTypes.Select(t => t.FullName));
-            errorMessage += $"\n\nFailing types:\n  - {failingTypes}";
-        }
-
-        Assert.That(result.IsSuccessful, Is.True, errorMessage);
+        Assert.That(result.IsSuccessful, Is.True, result.GetDetails(errorMessage));
     }
 
     [Test]
@@ -59,12 +48,6 @@ public class UserModuleLayerTests
             .GetResult();
 
         var errorMessage = "Application layer should not depend on Infrastructure layer";
-        if (!result.IsSuccessful && result.FailingTypes != null)
-        {
-            var failingTypes = string.Join("\n  - ", result.FailingTypes.Select(t => t.FullName));
-            errorMessage += $"\n\nFailing types:\n  - {failingTypes}";
-        }
-
-        Assert.That(result.IsSuccessful, Is.True, errorMessage);
+        Assert.That(result.IsSuccessful, Is.True, result.GetDetails(errorMessage));
     }
 }

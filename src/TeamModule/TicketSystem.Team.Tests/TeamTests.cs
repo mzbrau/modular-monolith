@@ -7,7 +7,7 @@ using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using TicketSystem.Team.Application;
-using TicketSystem.Team.Configuration;
+using TicketSystem.Team.Application.Configuration;
 using TicketSystem.Team.Domain;
 using TicketSystem.User.Contracts;
 

@@ -2,7 +2,7 @@ using Fig.Client.Abstractions.Attributes;
 using Fig.Client.Abstractions.Enums;
 using Fig.Client.Abstractions.Validation;
 
-namespace TicketSystem.Issue.Configuration;
+namespace TicketSystem.Issue.Application.Configuration;
 
 public class IssueSettings
 {

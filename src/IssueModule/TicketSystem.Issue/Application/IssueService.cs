@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using TicketSystem.Issue.Configuration;
+using TicketSystem.Issue.Application.Configuration;
 using TicketSystem.Issue.Domain;
 using TicketSystem.Team.Contracts;
 using TicketSystem.User.Contracts;

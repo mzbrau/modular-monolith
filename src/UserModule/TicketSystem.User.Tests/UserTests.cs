@@ -6,7 +6,7 @@ using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using TicketSystem.User.Application;
-using TicketSystem.User.Configuration;
+using TicketSystem.User.Application.Configuration;
 using TicketSystem.User.Domain;
 
 namespace TicketSystem.User.Tests;

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using TicketSystem.User.Configuration;
+using TicketSystem.User.Application.Configuration;
 using TicketSystem.User.Domain;
 
 namespace TicketSystem.User.Application;

@@ -2,7 +2,7 @@ using Fig.Client.Abstractions.Attributes;
 using Fig.Client.Abstractions.Enums;
 using Fig.Client.Abstractions.Validation;
 
-namespace TicketSystem.Team.Configuration;
+namespace TicketSystem.Team.Application.Configuration;
 
 public class TeamSettings
 {

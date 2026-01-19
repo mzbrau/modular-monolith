@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TicketSystem.Issue.Application.Adapters;
-using TicketSystem.Issue.Configuration;
+using TicketSystem.Issue.Application.Configuration;
 using TicketSystem.Issue.Contracts;
 using TicketSystem.Issue.Domain;
 using TicketSystem.Issue.Infrastructure.Grpc;
