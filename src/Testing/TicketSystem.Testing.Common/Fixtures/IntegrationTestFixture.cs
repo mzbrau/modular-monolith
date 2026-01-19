@@ -25,8 +25,22 @@ public abstract class IntegrationTestFixture
     {
         _factory = new TicketSystemWebApplicationFactory();
         
-        // Ensure the factory is fully initialized
-        _ = _factory.CreateClient();
+        // Ensure the factory is fully initialized by creating a client
+        var client = _factory.CreateClient();
+        
+        // Make a request to ensure the application has fully started and database is initialized
+        // This triggers the Program.cs startup code including database initialization
+        try
+        {
+            await client.GetAsync("/_health");
+        }
+        catch
+        {
+            // Ignore any errors from the health check - we just need to trigger startup
+        }
+        
+        // Ensure database schema is initialized before any operations
+        _factory.EnsureDatabaseInitialized();
         
         _databaseManager = new TestDatabaseManager(_factory.Services);
         

@@ -5,6 +5,8 @@ using Grpc.Net.Client;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using NHibernate;
 using TicketSystem.Api.Configuration;
 using TicketSystem.Api.Database;
 
@@ -62,9 +64,25 @@ public class TicketSystemWebApplicationFactory : WebApplicationFactory<Program>
         if (descriptor != null)
             services.Remove(descriptor);
         
+        // Remove existing SessionFactory registration as it was created with the wrong connection string
+        var sessionFactoryDescriptor = services.SingleOrDefault(d =>
+            d.ServiceType == typeof(ISessionFactory));
+        if (sessionFactoryDescriptor != null)
+            services.Remove(sessionFactoryDescriptor);
+        
         // Register test database path
         var connectionString = $"Data Source={_testDatabasePath};Version=3;";
         services.AddSingleton(new DatabaseOptions(connectionString));
+        
+        // Re-create session factory with test database connection string
+        // Find the module registration assemblies dynamically to avoid architecture violations
+        var moduleAssemblies = AppDomain.CurrentDomain.GetAssemblies()
+            .Where(a => a.FullName?.Contains("TicketSystem.") == true &&
+                       (a.FullName.Contains(".User,") || a.FullName.Contains(".Team,") || a.FullName.Contains(".Issue,")))
+            .ToArray();
+        
+        var sessionFactory = NHibernateConfiguration.CreateSessionFactory(connectionString, moduleAssemblies);
+        services.AddSingleton(sessionFactory);
     }
 
     private void ConfigureTestServices(IServiceCollection services)
@@ -89,6 +107,37 @@ public class TicketSystemWebApplicationFactory : WebApplicationFactory<Program>
     public T GetRequiredService<T>() where T : notnull
     {
         return Services.CreateScope().ServiceProvider.GetRequiredService<T>();
+    }
+
+    /// <summary>
+    /// Ensures the database schema is initialized.
+    /// This should be called after creating the factory to ensure all tables exist.
+    /// </summary>
+    public void EnsureDatabaseInitialized()
+    {
+        using var scope = Services.CreateScope();
+        var serviceProvider = scope.ServiceProvider;
+        
+        // Try to get DatabaseInitializer from DI, or create one if needed
+        DatabaseInitializer? dbInitializer = null;
+        try
+        {
+            dbInitializer = serviceProvider.GetService<DatabaseInitializer>();
+        }
+        catch
+        {
+            // DatabaseInitializer might not be registered yet
+        }
+        
+        if (dbInitializer == null)
+        {
+            // Create DatabaseInitializer manually if not registered
+            var databaseOptions = serviceProvider.GetRequiredService<DatabaseOptions>();
+            var logger = serviceProvider.GetRequiredService<ILogger<DatabaseInitializer>>();
+            dbInitializer = new DatabaseInitializer(databaseOptions, logger);
+        }
+        
+        dbInitializer.Initialize();
     }
 
     /// <summary>

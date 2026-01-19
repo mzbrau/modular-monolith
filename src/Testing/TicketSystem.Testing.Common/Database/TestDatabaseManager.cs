@@ -25,16 +25,32 @@ public class TestDatabaseManager
         
         // Delete in correct order to respect foreign keys
         // Issues must be deleted first (references Users and Teams)
-        await session.CreateSQLQuery("DELETE FROM Issues").ExecuteUpdateAsync();
-        
-        // TeamMembers links Teams and Users
-        await session.CreateSQLQuery("DELETE FROM TeamMembers").ExecuteUpdateAsync();
-        
-        // Then Teams and Users can be deleted
-        await session.CreateSQLQuery("DELETE FROM Teams").ExecuteUpdateAsync();
-        await session.CreateSQLQuery("DELETE FROM Users").ExecuteUpdateAsync();
+        // Use try-catch to handle cases where tables don't exist yet
+        await TryDeleteFromTableAsync(session, "Issues");
+        await TryDeleteFromTableAsync(session, "TeamMembers");
+        await TryDeleteFromTableAsync(session, "Teams");
+        await TryDeleteFromTableAsync(session, "Users");
         
         await transaction.CommitAsync();
+    }
+    
+    private static async Task TryDeleteFromTableAsync(ISession session, string tableName)
+    {
+        // Validate table name to prevent SQL injection (even though we only use hardcoded values)
+        if (!System.Text.RegularExpressions.Regex.IsMatch(tableName, "^[a-zA-Z0-9_]+$"))
+        {
+            throw new ArgumentException($"Invalid table name: {tableName}", nameof(tableName));
+        }
+        
+        try
+        {
+            await session.CreateSQLQuery($"DELETE FROM {tableName}").ExecuteUpdateAsync();
+        }
+        catch
+        {
+            // Ignore any errors during cleanup - table might not exist yet
+            // This is expected during initial test setup before database schema is created
+        }
     }
 
     /// <summary>
