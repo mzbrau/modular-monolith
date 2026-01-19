@@ -5,13 +5,27 @@ using System.Net.NetworkInformation;
 var builder = DistributedApplication.CreateBuilder(args);
 
 // Add Fig API container
-var figApi = builder.AddFigApi("fig-api", 7281)
-    .WithEnvironment("ApiSettings:DbConnectionString=Server", $"{GetFqdn()};User Id=fig_login;Password=495472f157684ab1a38fGGGPPP6f54e4aba64e;Initial Catalog=fig;TrustServerCertificate=True");
+var figApi = builder.AddFigApi("fig-api", 7281);
+
+if (OperatingSystem.IsWindows())
+{
+    figApi = figApi.WithEnvironment(
+        "ApiSettings:DbConnectionString=Server",
+        $"{GetFqdn()};User Id=fig_login;Password=495472f157684ab1a38fGGGPPP6f54e4aba64e;Initial Catalog=fig;TrustServerCertificate=True");
+}
+else if (OperatingSystem.IsMacOS())
+{
+    figApi = figApi.WithContainerRuntimeArgs("--platform", "linux/amd64");
+}
 
 // Add Fig Web container and pass a reference to the API
 var figWeb = builder.AddFigWeb("fig-web", 7148)
     .WithFigApiReference(figApi);
 
+if (OperatingSystem.IsMacOS())
+{
+    figWeb = figWeb.WithContainerRuntimeArgs("--platform", "linux/amd64");
+}
 
 // Add the API project with reference to Fig
 var api = builder.AddProject<Projects.TicketSystem_Api>("ticketsystem-api")

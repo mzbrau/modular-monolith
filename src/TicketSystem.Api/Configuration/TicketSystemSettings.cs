@@ -9,7 +9,8 @@ namespace TicketSystem.Api.Configuration;
 
 public class TicketSystemSettings : SettingsBase
 {
-    public override string ClientDescription => "TicketSystem modular monolith application";
+    private const string MarkdownKey = "$TicketSystemSettings";
+    public override string ClientDescription => MarkdownKey;
 
     [NestedSetting]
     public IssueSettings Issue { get; set; } = new();
@@ -20,21 +21,21 @@ public class TicketSystemSettings : SettingsBase
     [NestedSetting]
     public UserSettings User { get; set; } = new();
 
-    [Fig.Client.Abstractions.Attributes.Setting("Database connection timeout in seconds")]
+    [Fig.Client.Abstractions.Attributes.Setting($"{MarkdownKey}#DatabaseTimeoutSeconds")]
     [Category("Database", "#764BA2")]
     [ValidateIsBetween(5, 300, Inclusion.Inclusive)]
     public int DatabaseTimeoutSeconds { get; set; } = 30;
 
-    [Fig.Client.Abstractions.Attributes.Setting("Enable detailed database logging")]
+    [Fig.Client.Abstractions.Attributes.Setting($"{MarkdownKey}#EnableDatabaseLogging")]
     [Category("Database", "#764BA2")]
     public bool EnableDatabaseLogging { get; set; } = false;
 
-    [Fig.Client.Abstractions.Attributes.Setting("API request timeout in seconds")]
+    [Fig.Client.Abstractions.Attributes.Setting($"{MarkdownKey}#ApiTimeoutSeconds")]
     [Category("API", "#F093FB")]
     [ValidateIsBetween(10, 600, Inclusion.Inclusive)]
     public int ApiTimeoutSeconds { get; set; } = 60;
 
-    [Fig.Client.Abstractions.Attributes.Setting("Maximum API requests per minute per client")]
+    [Fig.Client.Abstractions.Attributes.Setting($"{MarkdownKey}#RateLimitPerMinute")]
     [Category("API", "#F093FB")]
     [ValidateIsBetween(10, 10000, Inclusion.Inclusive)]
     public int RateLimitPerMinute { get; set; } = 1000;

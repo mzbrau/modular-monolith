@@ -6,41 +6,43 @@ namespace TicketSystem.User.Application.Configuration;
 
 public class UserSettings
 {
-    [Setting("Minimum length for first name")]
+    private const string MarkdownKey = "$TicketSystemSettings";
+
+    [Setting($"{MarkdownKey}#MinFirstNameLength")]
     [Category("Validation", "#FFA07A")]
     [Validation(ValidationType.GreaterThanZero)]
     public int MinFirstNameLength { get; set; } = 1;
 
-    [Setting("Maximum length for first name")]
+    [Setting($"{MarkdownKey}#MaxFirstNameLength")]
     [Category("Validation", "#FFA07A")]
     [ValidateIsBetween(2, 50, Inclusion.Inclusive)]
     public int MaxFirstNameLength { get; set; } = 30;
 
-    [Setting("Minimum length for last name")]
+    [Setting($"{MarkdownKey}#MinLastNameLength")]
     [Category("Validation", "#FFA07A")]
     [Validation(ValidationType.GreaterThanZero)]
     public int MinLastNameLength { get; set; } = 1;
 
-    [Setting("Maximum length for last name")]
+    [Setting($"{MarkdownKey}#MaxLastNameLength")]
     [Category("Validation", "#FFA07A")]
     [ValidateIsBetween(2, 50, Inclusion.Inclusive)]
     public int MaxLastNameLength { get; set; } = 30;
 
-    [Setting("Email domain whitelist (comma-separated, empty for all)")]
+    [Setting($"{MarkdownKey}#AllowedEmailDomains")]
     [Category("Security", "#FF6347")]
     [MultiLine(3)]
     public string? AllowedEmailDomains { get; set; } = "";
 
-    [Setting("Require email verification before activation")]
+    [Setting($"{MarkdownKey}#RequireEmailVerification")]
     [Category("Security", "#FF6347")]
     public bool RequireEmailVerification { get; set; } = false;
 
-    [Setting("Automatically deactivate users after inactivity (days, 0 for never)")]
+    [Setting($"{MarkdownKey}#AutoDeactivateAfterDays")]
     [Category("Security", "#FF6347")]
     [ValidateIsBetween(0, 365, Inclusion.Inclusive)]
     public int AutoDeactivateAfterDays { get; set; } = 0;
 
-    [Setting("Allow users to be permanently deleted")]
+    [Setting($"{MarkdownKey}#AllowPermanentDelete")]
     [Category("Security", "#FF6347")]
     public bool AllowPermanentDelete { get; set; } = false;
 }
