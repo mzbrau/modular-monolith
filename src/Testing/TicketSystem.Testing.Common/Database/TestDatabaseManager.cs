@@ -36,6 +36,12 @@ public class TestDatabaseManager
     
     private static async Task TryDeleteFromTableAsync(ISession session, string tableName)
     {
+        // Validate table name to prevent SQL injection (even though we only use hardcoded values)
+        if (!System.Text.RegularExpressions.Regex.IsMatch(tableName, "^[a-zA-Z0-9_]+$"))
+        {
+            throw new ArgumentException($"Invalid table name: {tableName}", nameof(tableName));
+        }
+        
         try
         {
             await session.CreateSQLQuery($"DELETE FROM {tableName}").ExecuteUpdateAsync();
