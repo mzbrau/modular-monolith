@@ -1,6 +1,6 @@
 using TicketSystem.Testing.Common.Fixtures;
 using TicketSystem.User.Contracts;
-using TicketSystem.User.TestBuilders;
+using TicketSystem.TestBuilders;
 
 namespace TicketSystem.User.IntegrationTests.ApiTests;
 

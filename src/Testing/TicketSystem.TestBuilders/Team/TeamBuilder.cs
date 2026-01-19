@@ -1,7 +1,7 @@
 using TicketSystem.Testing.Common.Builders;
 using TicketSystem.Team.Contracts;
 
-namespace TicketSystem.Team.TestBuilders;
+namespace TicketSystem.TestBuilders;
 
 public class TeamBuilder : BuilderBase<TeamBuilder, CreateTeamRequest>
 {

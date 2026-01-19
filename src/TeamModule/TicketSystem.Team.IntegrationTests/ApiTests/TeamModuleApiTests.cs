@@ -1,8 +1,8 @@
 using TicketSystem.Testing.Common.Fixtures;
 using TicketSystem.Team.Contracts;
-using TicketSystem.Team.TestBuilders;
+using TicketSystem.TestBuilders;
 using TicketSystem.User.Contracts;
-using TicketSystem.User.TestBuilders;
+
 
 namespace TicketSystem.Team.IntegrationTests.ApiTests;
 

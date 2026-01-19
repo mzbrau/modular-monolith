@@ -6,113 +6,37 @@ namespace TicketSystem.Architecture.Tests;
 [TestFixture]
 public class TestProjectBoundaryTests
 {
-    // Test Builder assemblies
-    private static readonly Assembly UserTestBuildersAssembly = 
-        typeof(User.TestBuilders.UserBuilder).Assembly;
-    private static readonly Assembly TeamTestBuildersAssembly = 
-        typeof(Team.TestBuilders.TeamBuilder).Assembly;
-    private static readonly Assembly IssueTestBuildersAssembly = 
-        typeof(Issue.TestBuilders.IssueBuilder).Assembly;
+    // Test Builder assembly
+    private static readonly Assembly TestBuildersAssembly = 
+        typeof(TicketSystem.TestBuilders.UserBuilder).Assembly;
 
     // Integration Test assemblies
     private static readonly Assembly UserIntegrationTestsAssembly = 
-        typeof(User.IntegrationTests.UserModuleTestFixture).Assembly;
+        typeof(TicketSystem.User.IntegrationTests.UserModuleTestFixture).Assembly;
     private static readonly Assembly TeamIntegrationTestsAssembly = 
-        typeof(Team.IntegrationTests.TeamModuleTestFixture).Assembly;
+        typeof(TicketSystem.Team.IntegrationTests.TeamModuleTestFixture).Assembly;
     private static readonly Assembly IssueIntegrationTestsAssembly = 
-        typeof(Issue.IntegrationTests.IssueModuleTestFixture).Assembly;
+        typeof(TicketSystem.Issue.IntegrationTests.IssueModuleTestFixture).Assembly;
     
     [Test]
-    public void UserTestBuilders_ShouldNotReference_UserDomainOrApplication()
+    public void TestBuilders_ShouldNotReference_AnyModuleInternals()
     {
-        var result = Types.InAssembly(UserTestBuildersAssembly)
-            .ShouldNot()
-            .HaveDependencyOnAny(
-                "TicketSystem.User.Domain",
-                "TicketSystem.User.Application",
-                "TicketSystem.User.Infrastructure")
-            .GetResult();
-
-        AssertArchitectureResult(result, 
-            "User.TestBuilders should only reference User.Contracts, not internal modules");
-    }
-
-    [Test]
-    public void UserTestBuilders_ShouldNotReference_OtherModules()
-    {
-        var result = Types.InAssembly(UserTestBuildersAssembly)
-            .ShouldNot()
-            .HaveDependencyOnAny(
-                "TicketSystem.Team",
-                "TicketSystem.Issue")
-            .GetResult();
-
-        AssertArchitectureResult(result, 
-            "User.TestBuilders should not reference other modules");
-    }
-
-    [Test]
-    public void TeamTestBuilders_ShouldNotReference_TeamDomainOrApplication()
-    {
-        var result = Types.InAssembly(TeamTestBuildersAssembly)
-            .ShouldNot()
-            .HaveDependencyOnAny(
-                "TicketSystem.Team.Domain",
-                "TicketSystem.Team.Application",
-                "TicketSystem.Team.Infrastructure")
-            .GetResult();
-
-        AssertArchitectureResult(result, 
-            "Team.TestBuilders should only reference Team.Contracts, not internal modules");
-    }
-
-    [Test]
-    public void TeamTestBuilders_ShouldNotReference_OtherModuleInternals()
-    {
-        var result = Types.InAssembly(TeamTestBuildersAssembly)
+        var result = Types.InAssembly(TestBuildersAssembly)
             .ShouldNot()
             .HaveDependencyOnAny(
                 "TicketSystem.User.Domain",
                 "TicketSystem.User.Application",
                 "TicketSystem.User.Infrastructure",
-                "TicketSystem.Issue")
-            .GetResult();
-
-        AssertArchitectureResult(result, 
-            "Team.TestBuilders should not reference other modules' internals");
-    }
-
-    [Test]
-    public void IssueTestBuilders_ShouldNotReference_IssueDomainOrApplication()
-    {
-        var result = Types.InAssembly(IssueTestBuildersAssembly)
-            .ShouldNot()
-            .HaveDependencyOnAny(
+                "TicketSystem.Team.Domain",
+                "TicketSystem.Team.Application",
+                "TicketSystem.Team.Infrastructure",
                 "TicketSystem.Issue.Domain",
                 "TicketSystem.Issue.Application",
                 "TicketSystem.Issue.Infrastructure")
             .GetResult();
 
         AssertArchitectureResult(result, 
-            "Issue.TestBuilders should only reference Issue.Contracts, not internal modules");
-    }
-
-    [Test]
-    public void IssueTestBuilders_ShouldNotReference_OtherModuleInternals()
-    {
-        var result = Types.InAssembly(IssueTestBuildersAssembly)
-            .ShouldNot()
-            .HaveDependencyOnAny(
-                "TicketSystem.User.Domain",
-                "TicketSystem.User.Application",
-                "TicketSystem.User.Infrastructure",
-                "TicketSystem.Team.Domain",
-                "TicketSystem.Team.Application",
-                "TicketSystem.Team.Infrastructure")
-            .GetResult();
-
-        AssertArchitectureResult(result, 
-            "Issue.TestBuilders should not reference other modules' internals");
+            "TestBuilders should only reference Contracts, not internal modules");
     }
 
     [Test]
@@ -197,28 +121,18 @@ public class TestProjectBoundaryTests
     }
 
     [Test]
-    public void AllTestBuilders_CanReference_TestingCommon()
+    public void TestBuilders_ShouldReference_TestingCommon()
     {
         // This is an ALLOWED dependency - verify builders reference the common testing infrastructure
-        var userBuilderTypes = Types.InAssembly(UserTestBuildersAssembly)
-            .That()
-            .HaveDependencyOn("TicketSystem.Testing.Common")
-            .GetTypes();
-
-        var teamBuilderTypes = Types.InAssembly(TeamTestBuildersAssembly)
-            .That()
-            .HaveDependencyOn("TicketSystem.Testing.Common")
-            .GetTypes();
-
-        var issueBuilderTypes = Types.InAssembly(IssueTestBuildersAssembly)
+        var builderTypes = Types.InAssembly(TestBuildersAssembly)
             .That()
             .HaveDependencyOn("TicketSystem.Testing.Common")
             .GetTypes();
 
         // All test builders should reference Testing.Common
-        Assert.That(userBuilderTypes.Any() || teamBuilderTypes.Any() || issueBuilderTypes.Any(), 
+        Assert.That(builderTypes.Any(), 
             Is.True, 
-            "At least one TestBuilder should reference Testing.Common");
+            "TestBuilders should reference Testing.Common");
     }
 
     private static void AssertArchitectureResult(TestResult result, string errorMessage)

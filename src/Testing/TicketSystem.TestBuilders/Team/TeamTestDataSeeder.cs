@@ -1,6 +1,6 @@
 using TicketSystem.Team.Contracts;
 
-namespace TicketSystem.Team.TestBuilders;
+namespace TicketSystem.TestBuilders;
 
 /// <summary>
 /// Factory class for creating TeamBuilders within a test context.

@@ -1,7 +1,7 @@
 using TicketSystem.Testing.Common.Builders;
 using TicketSystem.User.Contracts;
 
-namespace TicketSystem.User.TestBuilders;
+namespace TicketSystem.TestBuilders;
 
 /// <summary>
 /// Fluent builder for creating test users via IUserModuleApi.

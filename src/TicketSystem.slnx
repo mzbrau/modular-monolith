@@ -7,26 +7,24 @@
     <Project Path="IssueModule/TicketSystem.Issue.Contracts/TicketSystem.Issue.Contracts.csproj" />
     <Project Path="IssueModule/TicketSystem.Issue.Tests/TicketSystem.Issue.Tests.csproj" />
     <Project Path="IssueModule/TicketSystem.Issue/TicketSystem.Issue.csproj" />
-    <Project Path="IssueModule/TicketSystem.Issue.TestBuilders/TicketSystem.Issue.TestBuilders.csproj" />
     <Project Path="IssueModule/TicketSystem.Issue.IntegrationTests/TicketSystem.Issue.IntegrationTests.csproj" />
   </Folder>
   <Folder Name="/Server/TeamModule/">
     <Project Path="TeamModule/TicketSystem.Team.Contracts/TicketSystem.Team.Contracts.csproj" />
     <Project Path="TeamModule/TicketSystem.Team.Tests/TicketSystem.Team.Tests.csproj" />
     <Project Path="TeamModule/TicketSystem.Team/TicketSystem.Team.csproj" />
-    <Project Path="TeamModule/TicketSystem.Team.TestBuilders/TicketSystem.Team.TestBuilders.csproj" />
     <Project Path="TeamModule/TicketSystem.Team.IntegrationTests/TicketSystem.Team.IntegrationTests.csproj" />
   </Folder>
   <Folder Name="/Server/UserModule/">
     <Project Path="UserModule/TicketSystem.User.Contracts/TicketSystem.User.Contracts.csproj" />
+    <Project Path="UserModule/TicketSystem.User.IntegrationTests/TicketSystem.User.IntegrationTests.csproj" />
     <Project Path="UserModule/TicketSystem.User.Tests/TicketSystem.User.Tests.csproj" />
     <Project Path="UserModule/TicketSystem.User/TicketSystem.User.csproj" />
-    <Project Path="UserModule/TicketSystem.User.TestBuilders/TicketSystem.User.TestBuilders.csproj" />
-    <Project Path="UserModule/TicketSystem.User.IntegrationTests/TicketSystem.User.IntegrationTests.csproj" />
   </Folder>
   <Folder Name="/Test/">
     <Project Path="TicketSystem.Architecture.Tests/TicketSystem.Architecture.Tests.csproj" />
     <Project Path="Testing/TicketSystem.Testing.Common/TicketSystem.Testing.Common.csproj" />
+    <Project Path="Testing/TicketSystem.TestBuilders/TicketSystem.TestBuilders.csproj" />
   </Folder>
   <Project Path="TicketSystem.AppHost/TicketSystem.AppHost.csproj" />
 </Solution>

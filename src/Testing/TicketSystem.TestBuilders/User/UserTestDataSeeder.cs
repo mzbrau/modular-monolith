@@ -1,6 +1,6 @@
 using TicketSystem.User.Contracts;
 
-namespace TicketSystem.User.TestBuilders;
+namespace TicketSystem.TestBuilders;
 
 /// <summary>
 /// Factory class for creating UserBuilders within a test context.

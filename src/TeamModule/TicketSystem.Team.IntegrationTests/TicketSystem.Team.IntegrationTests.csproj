@@ -31,8 +31,7 @@
         <ProjectReference Include="..\TicketSystem.Team.Contracts\TicketSystem.Team.Contracts.csproj" />
         
         <!-- Test builders from this and other modules -->
-        <ProjectReference Include="..\TicketSystem.Team.TestBuilders\TicketSystem.Team.TestBuilders.csproj" />
-        <ProjectReference Include="..\..\UserModule\TicketSystem.User.TestBuilders\TicketSystem.User.TestBuilders.csproj" />
+        <ProjectReference Include="..\..\Testing\TicketSystem.TestBuilders\TicketSystem.TestBuilders.csproj" />
     </ItemGroup>
 
 </Project>

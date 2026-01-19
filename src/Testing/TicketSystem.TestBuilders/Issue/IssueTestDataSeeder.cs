@@ -1,6 +1,6 @@
 using TicketSystem.Issue.Contracts;
 
-namespace TicketSystem.Issue.TestBuilders;
+namespace TicketSystem.TestBuilders;
 
 /// <summary>
 /// Factory class for creating IssueBuilders within a test context.

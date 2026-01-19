@@ -1,7 +1,7 @@
 using TicketSystem.Testing.Common.Builders;
 using TicketSystem.Issue.Contracts;
 
-namespace TicketSystem.Issue.TestBuilders;
+namespace TicketSystem.TestBuilders;
 
 public class IssueBuilder : BuilderBase<IssueBuilder, CreateIssueRequest>
 {
