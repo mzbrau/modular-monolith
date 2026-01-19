@@ -1,0 +1,41 @@
+name: Build And Test
+
+permissions:
+  checks: write
+  contents: read
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 10.0.x
+
+    - name: Restore dependencies
+      run: dotnet restore src/TicketSystem.slnx
+
+    - name: Build
+      run: dotnet build src/TicketSystem.slnx --no-restore
+
+    - name: Test
+      run: dotnet test src/TicketSystem.slnx --no-build --verbosity normal --logger "trx;LogFileName=test-results.trx" --collect:"XPlat Code Coverage"
+
+    - name: Test Report
+      uses: dorny/test-reporter@v1
+      if: success() || failure()
+      with:
+        name: .NET Tests
+        path: '**/test-results.trx'
+        reporter: dotnet-trx

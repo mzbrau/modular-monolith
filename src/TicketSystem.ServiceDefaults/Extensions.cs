@@ -52,11 +52,33 @@ public static class Extensions
         Directory.CreateDirectory(logsPath);
 
         // Configure Serilog
-        Log.Logger = new LoggerConfiguration()
+        var loggerConfiguration = new LoggerConfiguration()
             .ReadFrom.Configuration(builder.Configuration)
             .Enrich.FromLogContext()
-            .Enrich.WithProperty("ApplicationName", appName)
-            .CreateLogger();
+            .Enrich.WithProperty("ApplicationName", appName);
+
+        var otlpEndpoint = builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"];
+        if (!string.IsNullOrWhiteSpace(otlpEndpoint))
+        {
+            loggerConfiguration.WriteTo.OpenTelemetry(options =>
+            {
+                options.Endpoint = otlpEndpoint;
+                var headers = builder.Configuration["OTEL_EXPORTER_OTLP_HEADERS"];
+                if (headers is not null)
+                {
+                    options.Headers = headers.Split(',')
+                        .Select(h => h.Split('='))
+                        .Where(h => h.Length == 2)
+                        .ToDictionary(h => h[0], h => h[1]);
+                }
+                options.ResourceAttributes = new Dictionary<string, object>
+                {
+                    ["service.name"] = appName
+                };
+            });
+        }
+
+        Log.Logger = loggerConfiguration.CreateLogger();
 
         builder.Services.AddSerilog();
 
@@ -65,12 +87,6 @@ public static class Extensions
 
     public static TBuilder ConfigureOpenTelemetry<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
     {
-        builder.Logging.AddOpenTelemetry(logging =>
-        {
-            logging.IncludeFormattedMessage = true;
-            logging.IncludeScopes = true;
-        });
-
         builder.Services.AddOpenTelemetry()
             .WithMetrics(metrics =>
             {
