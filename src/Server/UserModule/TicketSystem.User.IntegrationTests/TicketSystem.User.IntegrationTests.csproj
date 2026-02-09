@@ -25,12 +25,12 @@
 
     <ItemGroup>
         <!-- Shared testing infrastructure -->
-        <ProjectReference Include="..\..\Testing\TicketSystem.Testing.Common\TicketSystem.Testing.Common.csproj" />
+        <ProjectReference Include="..\..\TicketSystem.Testing.Common\TicketSystem.Testing.Common.csproj" />
         
-        <!-- This module's contracts -->
-        <ProjectReference Include="..\TicketSystem.Issue.Contracts\TicketSystem.Issue.Contracts.csproj" />
+        <!-- This module's contracts (for type access in tests) -->
+        <ProjectReference Include="..\TicketSystem.User.Contracts\TicketSystem.User.Contracts.csproj" />
         
-        <!-- Test builders from ALL modules needed for data setup -->
+        <!-- Test builders for this module -->
     </ItemGroup>
 
 </Project>

@@ -14,13 +14,13 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Protobuf Include="..\UserModule\TicketSystem.User\Infrastructure\Grpc\user_service.proto" GrpcServices="Client" Link="Protos\user_service.proto"/>
-        <Protobuf Include="..\TeamModule\TicketSystem.Team\Infrastructure\Grpc\team_service.proto" GrpcServices="Client" Link="Protos\team_service.proto"/>
-        <Protobuf Include="..\IssueModule\TicketSystem.Issue\Infrastructure\Grpc\issue_service.proto" GrpcServices="Client" Link="Protos\issue_service.proto"/>
+        <Protobuf Include="..\..\Server\TeamModule\TicketSystem.Team\Infrastructure\Grpc\team_service.proto" GrpcServices="Client" Link="Protos\team_service.proto"/>
+        <Protobuf Include="..\..\Server\IssueModule\TicketSystem.Issue\Infrastructure\Grpc\issue_service.proto" GrpcServices="Client" Link="Protos\issue_service.proto"/>
+        <Protobuf Include="..\..\Server\UserModule\TicketSystem.User\Infrastructure\Grpc\user_service.proto" GrpcServices="Client" Link="Protos\user_service.proto"/>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\TicketSystem.ServiceDefaults\TicketSystem.ServiceDefaults.csproj" />
+      <ProjectReference Include="..\..\Server\TicketSystem.ServiceDefaults\TicketSystem.ServiceDefaults.csproj" />
     </ItemGroup>
 
 </Project>

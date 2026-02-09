@@ -1,32 +1,32 @@
 <Solution>
   <Folder Name="/Client/">
-    <Project Path="TicketSystem.Client/TicketSystem.Client.csproj" />
+    <Project Path="Client/TicketSystem.Client/TicketSystem.Client.csproj" />
   </Folder>
   <Folder Name="/Server/">
-    <Project Path="TicketSystem.Api/TicketSystem.Api.csproj" />
-    <Project Path="TicketSystem.ServiceDefaults/TicketSystem.ServiceDefaults.csproj" />
+    <Project Path="Server/TicketSystem.Api/TicketSystem.Api.csproj" />
+    <Project Path="Server/TicketSystem.ServiceDefaults/TicketSystem.ServiceDefaults.csproj" />
   </Folder>
   <Folder Name="/Server/IssueModule/">
-    <Project Path="IssueModule/TicketSystem.Issue.Contracts/TicketSystem.Issue.Contracts.csproj" />
-    <Project Path="IssueModule/TicketSystem.Issue.Tests/TicketSystem.Issue.Tests.csproj" />
-    <Project Path="IssueModule/TicketSystem.Issue/TicketSystem.Issue.csproj" />
-    <Project Path="IssueModule/TicketSystem.Issue.IntegrationTests/TicketSystem.Issue.IntegrationTests.csproj" />
+    <Project Path="Server/IssueModule/TicketSystem.Issue.Contracts/TicketSystem.Issue.Contracts.csproj" />
+    <Project Path="Server/IssueModule/TicketSystem.Issue.Tests/TicketSystem.Issue.Tests.csproj" />
+    <Project Path="Server/IssueModule/TicketSystem.Issue/TicketSystem.Issue.csproj" />
+    <Project Path="Server/IssueModule/TicketSystem.Issue.IntegrationTests/TicketSystem.Issue.IntegrationTests.csproj" />
   </Folder>
   <Folder Name="/Server/TeamModule/">
-    <Project Path="TeamModule/TicketSystem.Team.Contracts/TicketSystem.Team.Contracts.csproj" />
-    <Project Path="TeamModule/TicketSystem.Team.Tests/TicketSystem.Team.Tests.csproj" />
-    <Project Path="TeamModule/TicketSystem.Team/TicketSystem.Team.csproj" />
-    <Project Path="TeamModule/TicketSystem.Team.IntegrationTests/TicketSystem.Team.IntegrationTests.csproj" />
+    <Project Path="Server/TeamModule/TicketSystem.Team.Contracts/TicketSystem.Team.Contracts.csproj" />
+    <Project Path="Server/TeamModule/TicketSystem.Team.Tests/TicketSystem.Team.Tests.csproj" />
+    <Project Path="Server/TeamModule/TicketSystem.Team/TicketSystem.Team.csproj" />
+    <Project Path="Server/TeamModule/TicketSystem.Team.IntegrationTests/TicketSystem.Team.IntegrationTests.csproj" />
   </Folder>
   <Folder Name="/Server/UserModule/">
-    <Project Path="UserModule/TicketSystem.User.Contracts/TicketSystem.User.Contracts.csproj" />
-    <Project Path="UserModule/TicketSystem.User.IntegrationTests/TicketSystem.User.IntegrationTests.csproj" />
-    <Project Path="UserModule/TicketSystem.User.Tests/TicketSystem.User.Tests.csproj" />
-    <Project Path="UserModule/TicketSystem.User/TicketSystem.User.csproj" />
+    <Project Path="Server/UserModule/TicketSystem.User.Contracts/TicketSystem.User.Contracts.csproj" />
+    <Project Path="Server/UserModule/TicketSystem.User.IntegrationTests/TicketSystem.User.IntegrationTests.csproj" />
+    <Project Path="Server/UserModule/TicketSystem.User.Tests/TicketSystem.User.Tests.csproj" />
+    <Project Path="Server/UserModule/TicketSystem.User/TicketSystem.User.csproj" />
   </Folder>
   <Folder Name="/Test/">
     <Project Path="TicketSystem.Architecture.Tests/TicketSystem.Architecture.Tests.csproj" />
-    <Project Path="Testing/TicketSystem.Testing.Common/TicketSystem.Testing.Common.csproj" />
+    <Project Path="Server/TicketSystem.Testing.Common/TicketSystem.Testing.Common.csproj" />
   </Folder>
   <Project Path="TicketSystem.AppHost/TicketSystem.AppHost.csproj" />
 </Solution>

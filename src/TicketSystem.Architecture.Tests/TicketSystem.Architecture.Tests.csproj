@@ -25,17 +25,17 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\UserModule\TicketSystem.User\TicketSystem.User.csproj" />
-        <ProjectReference Include="..\UserModule\TicketSystem.User.Contracts\TicketSystem.User.Contracts.csproj" />
-        <ProjectReference Include="..\TeamModule\TicketSystem.Team\TicketSystem.Team.csproj" />
-        <ProjectReference Include="..\TeamModule\TicketSystem.Team.Contracts\TicketSystem.Team.Contracts.csproj" />
-        <ProjectReference Include="..\IssueModule\TicketSystem.Issue\TicketSystem.Issue.csproj" />
-        <ProjectReference Include="..\IssueModule\TicketSystem.Issue.Contracts\TicketSystem.Issue.Contracts.csproj" />
+        <ProjectReference Include="..\Server\UserModule\TicketSystem.User\TicketSystem.User.csproj" />
+        <ProjectReference Include="..\Server\UserModule\TicketSystem.User.Contracts\TicketSystem.User.Contracts.csproj" />
+        <ProjectReference Include="..\Server\TeamModule\TicketSystem.Team\TicketSystem.Team.csproj" />
+        <ProjectReference Include="..\Server\TeamModule\TicketSystem.Team.Contracts\TicketSystem.Team.Contracts.csproj" />
+        <ProjectReference Include="..\Server\IssueModule\TicketSystem.Issue\TicketSystem.Issue.csproj" />
+        <ProjectReference Include="..\Server\IssueModule\TicketSystem.Issue.Contracts\TicketSystem.Issue.Contracts.csproj" />
         
         <!-- Test projects for boundary validation -->
-        <ProjectReference Include="..\UserModule\TicketSystem.User.IntegrationTests\TicketSystem.User.IntegrationTests.csproj" />
-        <ProjectReference Include="..\TeamModule\TicketSystem.Team.IntegrationTests\TicketSystem.Team.IntegrationTests.csproj" />
-        <ProjectReference Include="..\IssueModule\TicketSystem.Issue.IntegrationTests\TicketSystem.Issue.IntegrationTests.csproj" />
+        <ProjectReference Include="..\Server\UserModule\TicketSystem.User.IntegrationTests\TicketSystem.User.IntegrationTests.csproj" />
+        <ProjectReference Include="..\Server\TeamModule\TicketSystem.Team.IntegrationTests\TicketSystem.Team.IntegrationTests.csproj" />
+        <ProjectReference Include="..\Server\IssueModule\TicketSystem.Issue.IntegrationTests\TicketSystem.Issue.IntegrationTests.csproj" />
     </ItemGroup>
 
 </Project>
