@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/Client/">
     <Project Path="Client/TicketSystem.Client/TicketSystem.Client.csproj" />
+    <Project Path="Client/TicketSystem.Client.Wpf/TicketSystem.Client.Wpf.csproj" />
   </Folder>
   <Folder Name="/Server/">
     <Project Path="Server/TicketSystem.Api/TicketSystem.Api.csproj" />
@@ -27,6 +28,7 @@
   <Folder Name="/Test/">
     <Project Path="TicketSystem.Architecture.Tests/TicketSystem.Architecture.Tests.csproj" />
     <Project Path="Server/TicketSystem.Testing.Common/TicketSystem.Testing.Common.csproj" />
+    <Project Path="Client/TicketSystem.Client.Wpf.Tests/TicketSystem.Client.Wpf.Tests.csproj" />
   </Folder>
   <Project Path="TicketSystem.AppHost/TicketSystem.AppHost.csproj" />
 </Solution>

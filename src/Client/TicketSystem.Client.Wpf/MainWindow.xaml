@@ -1,0 +1,89 @@
+<Window x:Class="TicketSystem.Client.Wpf.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:views="clr-namespace:TicketSystem.Client.Wpf.Views"
+        xmlns:viewModels="clr-namespace:TicketSystem.Client.Wpf.ViewModels"
+        mc:Ignorable="d"
+        Title="Ticket System" Height="700" Width="1200"
+        WindowStartupLocation="CenterScreen">
+    
+    <Window.Resources>
+        <!-- DataTemplates to map ViewModels to Views -->
+        <DataTemplate DataType="{x:Type viewModels:IssuesViewModel}">
+            <views:IssuesView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:TeamsViewModel}">
+            <views:TeamsView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:UsersViewModel}">
+            <views:UsersView/>
+        </DataTemplate>
+    </Window.Resources>
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Menu Bar -->
+        <Menu Grid.Row="0">
+            <MenuItem Header="_File">
+                <MenuItem Header="_Settings" Click="SettingsMenuItem_Click"/>
+                <Separator/>
+                <MenuItem Header="E_xit" Click="ExitMenuItem_Click"/>
+            </MenuItem>
+        </Menu>
+        
+        <!-- Header with Title -->
+        <Border Grid.Row="1" Background="#2C3E50" Padding="15">
+            <TextBlock Text="Ticket System" 
+                       Foreground="White" 
+                       FontSize="20" 
+                       FontWeight="Bold"/>
+        </Border>
+        
+        <!-- Main Content Area -->
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="200"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            
+            <!-- Navigation Menu -->
+            <Border Grid.Column="0" Background="#34495E" BorderBrush="#2C3E50" BorderThickness="0,0,1,0">
+                <StackPanel Margin="0,10,0,0">
+                    <Button x:Name="IssuesButton" 
+                            Content="Issues" 
+                            Click="IssuesButton_Click"
+                            Style="{StaticResource NavigationButtonStyle}"
+                            Margin="10,5"/>
+                    <Button x:Name="TeamsButton" 
+                            Content="Teams" 
+                            Click="TeamsButton_Click"
+                            Style="{StaticResource NavigationButtonStyle}"
+                            Margin="10,5"/>
+                    <Button x:Name="UsersButton" 
+                            Content="Users" 
+                            Click="UsersButton_Click"
+                            Style="{StaticResource NavigationButtonStyle}"
+                            Margin="10,5"/>
+                </StackPanel>
+            </Border>
+            
+            <!-- Content Area -->
+            <ContentControl x:Name="ContentArea" 
+                            Grid.Column="1" 
+                            Content="{Binding CurrentViewModel}"/>
+        </Grid>
+        
+        <!-- Status Bar -->
+        <Border Grid.Row="3" Background="#ECF0F1" BorderBrush="#BDC3C7" BorderThickness="0,1,0,0" Padding="10,5">
+            <TextBlock x:Name="StatusText" Text="Ready" Foreground="#7F8C8D"/>
+        </Border>
+    </Grid>
+</Window>

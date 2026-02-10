@@ -1,0 +1,81 @@
+<Window x:Class="TicketSystem.Client.Wpf.Views.SettingsDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:converters="clr-namespace:TicketSystem.Client.Wpf.Converters"
+        mc:Ignorable="d"
+        Title="Settings" 
+        Height="250" 
+        Width="500"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize">
+    
+    <Window.Resources>
+        <converters:NotNullToVisibilityConverter x:Key="NotNullToVisibilityConverter"/>
+    </Window.Resources>
+    
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Title -->
+        <TextBlock Grid.Row="0" 
+                   Text="Application Settings" 
+                   FontSize="18" 
+                   FontWeight="Bold" 
+                   Margin="0,0,0,20"/>
+        
+        <!-- Server Address -->
+        <StackPanel Grid.Row="1" Margin="0,0,0,10">
+            <TextBlock Text="gRPC Server Address:" 
+                       FontWeight="Bold" 
+                       Margin="0,0,0,5"/>
+            <TextBox Text="{Binding ServerAddress, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                     Padding="5"
+                     FontSize="14"/>
+            <TextBlock Text="Example: https://localhost:7001" 
+                       FontSize="11" 
+                       Foreground="Gray" 
+                       Margin="0,3,0,0"/>
+        </StackPanel>
+        
+        <!-- Validation Error -->
+        <Border Grid.Row="2" 
+                Visibility="{Binding ValidationError, Converter={StaticResource NotNullToVisibilityConverter}}"
+                Background="#FFEEEE" 
+                BorderBrush="#FF0000" 
+                BorderThickness="1"
+                Padding="10"
+                Margin="0,0,0,10">
+            <TextBlock Text="{Binding ValidationError}" 
+                       Foreground="#CC0000" 
+                       TextWrapping="Wrap"/>
+        </Border>
+        
+        <!-- Spacer -->
+        <Grid Grid.Row="3"/>
+        
+        <!-- Buttons -->
+        <StackPanel Grid.Row="4" 
+                    Orientation="Horizontal" 
+                    HorizontalAlignment="Right">
+            <Button Content="Save" 
+                    Command="{Binding SaveCommand}" 
+                    Width="80" 
+                    Height="30" 
+                    Margin="0,0,10,0"
+                    IsDefault="True"/>
+            <Button Content="Cancel" 
+                    Command="{Binding CancelCommand}" 
+                    Width="80" 
+                    Height="30"
+                    IsCancel="True"/>
+        </StackPanel>
+    </Grid>
+</Window>

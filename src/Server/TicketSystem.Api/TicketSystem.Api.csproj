@@ -25,9 +25,9 @@
     </ItemGroup>
 
     <ItemGroup>
-        <EmbeddedResource Include="..\..\docs\*.md" LinkBase="Docs" />
-        <EmbeddedResource Include="..\..\docs\img\*.svg" LinkBase="Docs" />
-        <EmbeddedResource Include="..\..\docs\img\*.png" LinkBase="Docs" />
+        <EmbeddedResource Include="..\..\..\docs\*.md" LinkBase="Docs" />
+        <EmbeddedResource Include="..\..\..\docs\img\*.svg" LinkBase="Docs" />
+        <EmbeddedResource Include="..\..\..\docs\img\*.png" LinkBase="Docs" />
     </ItemGroup>
 
 <!-- M2 macs can't use the nuget package as it does not support that processor -->

@@ -1,0 +1,173 @@
+<UserControl x:Class="TicketSystem.Client.Wpf.Views.TeamsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:converters="clr-namespace:TicketSystem.Client.Wpf.Converters"
+             mc:Ignorable="d" 
+             d:DesignHeight="600" d:DesignWidth="1000">
+    
+    <UserControl.Resources>
+        <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+        <converters:DateTimeToStringConverter x:Key="DateTimeToStringConverter"/>
+        <converters:NotNullToBoolConverter x:Key="NotNullToBoolConverter"/>
+        <converters:NotNullToVisibilityConverter x:Key="NotNullToVisibilityConverter"/>
+        <converters:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
+    </UserControl.Resources>
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Main Content Area -->
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="5"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            
+            <!-- Team List -->
+            <Grid Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                
+                <TextBlock Grid.Row="0" Text="Teams" FontSize="16" FontWeight="Bold" Margin="10"/>
+                
+                <DataGrid x:Name="TeamsDataGrid" Grid.Row="1" 
+                          ItemsSource="{Binding Teams}" 
+                          SelectedItem="{Binding SelectedTeam, Mode=TwoWay}"
+                          AutoGenerateColumns="False"
+                          IsReadOnly="True"
+                          SelectionMode="Single"
+                          CanUserAddRows="False"
+                          CanUserDeleteRows="False"
+                          GridLinesVisibility="Horizontal"
+                          HeadersVisibility="Column"
+                          AlternatingRowBackground="#F9F9F9">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*" MinWidth="150"/>
+                        <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="2*" MinWidth="200"/>
+                        <DataGridTextColumn Header="Members" Binding="{Binding Members.Count}" Width="80"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+            
+            <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" Background="#CCCCCC"/>
+            
+            <!-- Team Detail/Form Panel -->
+            <Border Grid.Column="2" BorderBrush="#CCCCCC" BorderThickness="1,0,0,0" Padding="10">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <TextBlock Text="Team Form" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
+                        
+                        <!-- Input Form -->
+                        <TextBlock Text="Team Name:" FontWeight="Bold" Margin="0,5,0,2"/>
+                        <TextBox Text="{Binding TeamName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                 Margin="0,0,0,10"/>
+                        
+                        <TextBlock Text="Description:" FontWeight="Bold" Margin="0,5,0,2"/>
+                        <TextBox Text="{Binding TeamDescription, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                 TextWrapping="Wrap" 
+                                 AcceptsReturn="True"
+                                 MinHeight="60"
+                                 Margin="0,0,0,10"/>
+                        
+                        <Separator Margin="0,10"/>
+                        
+                        <!-- Member Management Section -->
+                        <StackPanel Visibility="{Binding SelectedTeam, Converter={StaticResource NotNullToVisibilityConverter}}">
+                            <TextBlock Text="Team Members" FontSize="14" FontWeight="Bold" Margin="0,10,0,5"/>
+                            
+                            <DataGrid x:Name="TeamMembersDataGrid"
+                                      ItemsSource="{Binding TeamMembers}" 
+                                      AutoGenerateColumns="False"
+                                      IsReadOnly="True"
+                                      SelectionMode="Single"
+                                      CanUserAddRows="False"
+                                      CanUserDeleteRows="False"
+                                      GridLinesVisibility="Horizontal"
+                                      HeadersVisibility="Column"
+                                      MaxHeight="200"
+                                      Margin="0,0,0,10">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="User ID" Binding="{Binding UserId}" Width="*"/>
+                                    <DataGridTextColumn Header="Role" Binding="{Binding Role}" Width="60"/>
+                                    <DataGridTextColumn Header="Joined" 
+                                                        Binding="{Binding JoinedDate, Converter={StaticResource DateTimeToStringConverter}, ConverterParameter='d'}" 
+                                                        Width="100"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                            
+                            <TextBlock Text="Add Member - User ID:" FontWeight="Bold" Margin="0,10,0,2"/>
+                            <TextBox Text="{Binding SelectedUserId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                     Margin="0,0,0,5"/>
+                            
+                            <TextBlock Text="Role (0=Member, 1=Admin):" FontWeight="Bold" Margin="0,5,0,2"/>
+                            <TextBox Text="{Binding SelectedRole, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                     Margin="0,0,0,10"/>
+                            
+                            <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                                <Button Content="Add Member" Command="{Binding AddMemberCommand}" 
+                                        Padding="10,5" Margin="0,0,10,0"/>
+                            </StackPanel>
+                            
+                            <Separator Margin="0,10"/>
+                            
+                            <TextBlock Text="Selected Team Details" FontSize="14" FontWeight="Bold" Margin="0,10,0,5"/>
+                            <TextBlock Text="ID:" FontWeight="Bold" Margin="0,5,0,2"/>
+                            <TextBlock Text="{Binding SelectedTeam.Id}" TextWrapping="Wrap" Margin="0,0,0,5"/>
+                            
+                            <TextBlock Text="Created:" FontWeight="Bold" Margin="0,5,0,2"/>
+                            <TextBlock Text="{Binding SelectedTeam.CreatedDate, Converter={StaticResource DateTimeToStringConverter}}" Margin="0,0,0,5"/>
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+        </Grid>
+        
+        <!-- Action Buttons -->
+        <Border Grid.Row="1" Background="#F5F5F5" Padding="10" BorderBrush="#CCCCCC" BorderThickness="0,1,0,0">
+            <StackPanel Orientation="Horizontal">
+                <Button Content="Load Teams" Command="{Binding LoadTeamsCommand}" 
+                        Padding="10,5" Margin="0,0,10,0"/>
+                <Button Content="Create Team" Command="{Binding CreateTeamCommand}" 
+                        Padding="10,5" Margin="0,0,10,0"/>
+                <Button Content="Edit Team" Command="{Binding EditTeamCommand}" 
+                        IsEnabled="{Binding SelectedTeam, Converter={StaticResource NotNullToBoolConverter}}"
+                        Padding="10,5"/>
+            </StackPanel>
+        </Border>
+        
+        <!-- Loading Indicator Overlay -->
+        <Grid Grid.RowSpan="2" 
+              Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibilityConverter}}"
+              Background="#80000000">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                <ProgressBar IsIndeterminate="True" Width="200" Height="20"/>
+                <TextBlock Text="Loading..." Foreground="White" Margin="0,10,0,0" FontSize="14"/>
+            </StackPanel>
+        </Grid>
+        
+        <!-- Error Message Display -->
+        <Border Grid.RowSpan="2" 
+                Visibility="{Binding ErrorMessage, Converter={StaticResource NotNullToVisibilityConverter}}"
+                Background="#FFEEEE" 
+                BorderBrush="#FF0000" 
+                BorderThickness="2"
+                Padding="10"
+                Margin="20"
+                VerticalAlignment="Top">
+            <StackPanel>
+                <TextBlock Text="Error" FontWeight="Bold" Foreground="#CC0000" Margin="0,0,0,5"/>
+                <TextBlock Text="{Binding ErrorMessage}" TextWrapping="Wrap" Foreground="#CC0000"/>
+                <Button Content="Dismiss" Command="{Binding DismissErrorCommand}" 
+                        HorizontalAlignment="Right" Margin="0,10,0,0" Padding="10,5"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>
